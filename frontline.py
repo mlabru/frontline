@@ -84,7 +84,6 @@ def trata_carrapato(fdt_gmt, fs_file):
 
     # filename
     ls_file = pathlib.PurePath(fs_file).name
-    M_LOG.debug("ls_file: %s", ls_file)
 
     # format date
     ls_dia = fdt_gmt.strftime("%Y-%m-%d")
@@ -96,12 +95,10 @@ def trata_carrapato(fdt_gmt, fs_file):
 
     # icao code
     ls_icao_code = llst_tmp[2].strip().upper()
-    M_LOG.debug("ls_icao_code: %s", ls_icao_code)
 
     # get closer station
     ls_station, lf_altitude = ll.find_near_station(ls_icao_code)
-    M_LOG.debug("ls_station: %s", ls_station)
-    M_LOG.debug("lf_altitude: %s", lf_altitude)
+    M_LOG.info("near station: %s @ %s (m)", str(ls_station), str(lf_altitude))
 
     # ok ?
     if ls_station is None:
@@ -137,7 +134,6 @@ def main():
 
     # format full date
     ls_date = ldt_now_gmt.strftime("%Y%m%d%H")
-    M_LOG.debug("ls_date: %s", ls_date)
 
     # find all stations in directory...
     for ls_file in glob.glob("{}/saida_carrapato_????_{}.txt".format(df.DS_TICKS_DIR, ls_date)):

@@ -172,7 +172,7 @@ def grp_wind(fdct_reg, fo_metaf):
         li_wvel = fo_metaf.i_wind_vel_kt
 
     # group wind
-    ls_wind += "{:02d}".format(li_wvel)
+    ls_wind += "{:02d}".format(li_wvel) if li_wvel < 100 else "P99"
 
     # vento, rajada máxima
     l_wraj = fdct_reg.get("VEN_RAJ", None)
@@ -195,7 +195,7 @@ def grp_wind(fdct_reg, fo_metaf):
     if li_wraj >= (li_wvel + 10):
         # format
         ls_wind += 'G'
-        ls_wind += "{:02d}".format(li_wraj)
+        ls_wind += "{:02d}".format(li_wraj) if li_wraj < 100 else "P99"
 
     # return group wind
     return "{}KT".format(ls_wind)

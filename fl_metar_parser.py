@@ -119,7 +119,7 @@ class SMetar:
                 self._v_skc = True
 
                 # logger
-                M_LOG.debug("Clouds: Sky is clear.")
+                # M_LOG.info("Clouds: Sky is clear.")
 
             # nsc ?
             if "NSC" == ls_type_cloud:
@@ -127,7 +127,7 @@ class SMetar:
                 self._v_nsc = True
 
                 # logger
-                M_LOG.debug("Clouds: No significant cloud clouds.")
+                # M_LOG.info("Clouds: No significant cloud clouds.")
 
             # few ?
             if "FEW" == ls_type_cloud[:-3]:
@@ -138,7 +138,7 @@ class SMetar:
                 self._v_few = True
 
                 # logger
-                M_LOG.debug("Clouds: Few clouds at %d feet (%f meter).", self._i_few_feet, self._f_few_m)
+                # M_LOG.info("Clouds: Few clouds at %d feet (%f meter).", self._i_few_feet, self._f_few_m)
 
             # sct ?
             if "SCT" == ls_type_cloud[:-3]:
@@ -149,7 +149,7 @@ class SMetar:
                 self._v_sct = True
 
                 # logger
-                M_LOG.debug("Clouds: Scattered clouds at %d feet (%f meter).", self._i_sct_feet, self._f_sct_m)
+                # M_LOG.info("Clouds: Scattered clouds at %d feet (%f meter).", self._i_sct_feet, self._f_sct_m)
 
             # bkn ?
             if "BKN" == ls_type_cloud[:-3]:
@@ -160,7 +160,7 @@ class SMetar:
                 self._v_bkn = True
 
                 # logger
-                M_LOG.debug("Clouds: Broken clouds at %d feet (%f meter).", self._i_bkn_feet, self._f_bkn_m)
+                # M_LOG.info("Clouds: Broken clouds at %d feet (%f meter).", self._i_bkn_feet, self._f_bkn_m)
 
             # ovc ?
             if "OVC" == ls_type_cloud[:-3]:
@@ -171,7 +171,7 @@ class SMetar:
                 self._v_ovc = True
 
                 # logger
-                M_LOG.debug("Clouds: Overcast clouds at %d feet (%f meter).", self._i_ovc_feet, self._f_ovc_m)
+                # M_LOG.info("Clouds: Overcast clouds at %d feet (%f meter).", self._i_ovc_feet, self._f_ovc_m)
 
             # vv ?
             if "VV" == ls_type_cloud[:-3]:
@@ -179,7 +179,7 @@ class SMetar:
                 self._v_vv = True
 
                 # logger
-                M_LOG.debug("Clouds: Clouds cannot be seen because of fog or heavy precipitation.")
+                # M_LOG.info("Clouds: Clouds cannot be seen because of fog or heavy precipitation.")
 
     # ---------------------------------------------------------------------------------------------
     def forecast_time(self):
@@ -194,7 +194,7 @@ class SMetar:
         self._s_forecast_time = str(l_result[0])
 
         # logger
-        M_LOG.debug("Time issued: %s %s:%s.", l_result[0][:2], l_result[0][2:4], l_result[0][4:6])
+        # M_LOG.info("Time issued: %s %s:%s.", l_result[0][:2], l_result[0][2:4], l_result[0][4:6])
 
     # ---------------------------------------------------------------------------------------------
     def icao_code(self):
@@ -208,7 +208,7 @@ class SMetar:
         self._s_icao_code = str(l_result[0])
 
         # logger
-        M_LOG.debug("Identifier: %s.", self._s_icao_code)
+        # M_LOG.info("Identifier: %s.", self._s_icao_code)
 
     # ---------------------------------------------------------------------------------------------
     def pressure(self):
@@ -223,7 +223,7 @@ class SMetar:
             self._i_pressure_hpa = int(l_result[0][1:])
 
             # logger
-            M_LOG.debug("Pressure: QNH %d hPa.", self._i_pressure_hpa)
+            # M_LOG.info("Pressure: QNH %d hPa.", self._i_pressure_hpa)
 
         # search for QNH (inHg)
         l_result = re.search(r"[A][0-9]{4}", self._s_metar_data)
@@ -233,7 +233,7 @@ class SMetar:
             self._i_pressure_inhg = float(l_result[0][1:-2] + "." + l_result[0][3:])
 
             # logger
-            M_LOG.debug("Pressure: Sea level pressure is %d inHg.", self._i_pressure_inhg)
+            # M_LOG.info("Pressure: Sea level pressure is %d inHg.", self._i_pressure_inhg)
 
     # ---------------------------------------------------------------------------------------------
     def remarks(self):
@@ -248,7 +248,7 @@ class SMetar:
             self._v_a02 = True
 
             # logger
-            M_LOG.debug("This station is automated with a precipitation discriminator (rain/snow) sensor.")
+            # M_LOG.info("This station is automated with a precipitation discriminator (rain/snow) sensor.")
 
         # search for notes
         l_result = re.search(r"PWINO", self._s_metar_data)
@@ -258,7 +258,7 @@ class SMetar:
             self._v_pwino = True
 
             # logger
-            M_LOG.debug("Precipitation identifier sensor not available.")
+            # M_LOG.info("Precipitation identifier sensor not available.")
 
         # search for notes
         l_result = re.search(r"\$", self._s_metar_data)
@@ -268,7 +268,7 @@ class SMetar:
             self._v_maint = True
 
             # logger
-            M_LOG.debug("System needs maintance.")
+            # M_LOG.info("System needs maintance.")
 
     # ---------------------------------------------------------------------------------------------
     def report_type(self):
@@ -288,7 +288,7 @@ class SMetar:
                 self._v_corr = True
 
                 # logger
-                M_LOG.debug("Report type: This is a correction report")
+                # M_LOG.info("Report type: This is a correction report")
 
         # search for report type
         l_result = re.search(r"AUTO", self._s_metar_data)
@@ -300,7 +300,7 @@ class SMetar:
                 self._v_auto = True
 
                 # logger
-                M_LOG.debug("Report type: This is a fully automated report")
+                # M_LOG.info("Report type: This is a fully automated report")
 
     # ---------------------------------------------------------------------------------------------
     def temperature(self):
@@ -327,10 +327,10 @@ class SMetar:
             self._i_dewpoint_f = int((self._i_dewpoint_c * 9 / 5) + 32)
 
             # logger
-            M_LOG.debug("Temperature %d°C (%d°F) Dewpoint %d°C (%d°F).", self._i_temperature_c,
-                                                                         self._i_temperature_f,
-                                                                         self._i_dewpoint_c,
-                                                                         self._i_dewpoint_f)
+            # M_LOG.info("Temperature %d°C (%d°F) Dewpoint %d°C (%d°F).", self._i_temperature_c,
+            #                                                             self._i_temperature_f,
+            #                                                             self._i_dewpoint_c,
+            #                                                             self._i_dewpoint_f)
 
     # ---------------------------------------------------------------------------------------------
     def trends(self):
@@ -347,7 +347,7 @@ class SMetar:
                 self._v_nosig = True
 
                 # logger
-                M_LOG.debug("Trends: No significant change is expected to the reported conditions within the next 2 hours.")
+                # M_LOG.info("Trends: No significant change is expected to the reported conditions within the next 2 hours.")
 
             # becmg ?
             if "BECMG" == l_result[0]:
@@ -355,7 +355,7 @@ class SMetar:
                 self._v_becmg = True
 
                 # logger
-                M_LOG.debug("Trends: Sustained significant changes in weather conditions are expected.")
+                # M_LOG.info("Trends: Sustained significant changes in weather conditions are expected.")
 
             # tempo ?
             if "TEMPO" == l_result[0]:
@@ -363,7 +363,7 @@ class SMetar:
                 self._v_tempo = True
 
                 # logger
-                M_LOG.debug("Trends: Temporary significant changes in weather conditions are expected.")
+                # M_LOG.info("Trends: Temporary significant changes in weather conditions are expected.")
 
     # ---------------------------------------------------------------------------------------------
     def visibility(self):
@@ -380,7 +380,7 @@ class SMetar:
                 self._v_cavok = True
 
                 # logger
-                M_LOG.debug("Visibility: Ceiling And Visibility OK.")
+                # M_LOG.info("Visibility: Ceiling And Visibility OK.")
 
             # senão,...
             else:
@@ -390,7 +390,7 @@ class SMetar:
                     self._i_visibility = 9999
 
                     # logger
-                    M_LOG.debug("Visibility: 10km or more.")
+                    # M_LOG.info("Visibility: 10km or more.")
 
                 # senão,...
                 else:
@@ -398,7 +398,7 @@ class SMetar:
                     self._i_visibility = int(l_result[0].replace(' ', ''))
 
                     # logger
-                    M_LOG.debug("Visibility: %d meter.", self._i_visibility)
+                    # M_LOG.info("Visibility: %d meter.", self._i_visibility)
 
     # ---------------------------------------------------------------------------------------------
     def weather_type(self):
@@ -422,8 +422,10 @@ class SMetar:
             self._s_weather_text = df.DDCT_WEATHER.get(self._s_weather, None)
             
             if self._s_weather_text:
+                pass
+                 
                 # logger
-                M_LOG.debug("Weather: %s.", str(self._s_weather_text))
+                # M_LOG.info("Weather: %s.", str(self._s_weather_text))
 
     # ---------------------------------------------------------------------------------------------
     def wind_type(self):
@@ -442,9 +444,9 @@ class SMetar:
             self._i_wind_vel_kt = int(round(self._i_wind_vel_mps * df.DF_MPS2KT, 0))
 
             # logger
-            M_LOG.debug("Wind: Winds from %d° at %d mps (%d knots).", self._i_wind_dir,
-                                                                      self._i_wind_vel_mps,
-                                                                      self._i_wind_vel_kt)
+            # M_LOG.info("Wind: Winds from %d° at %d mps (%d knots).", self._i_wind_dir,
+            #                                                          self._i_wind_vel_mps,
+            #                                                          self._i_wind_vel_kt)
 
         # search for velocity (kt)
         l_results = re.search(r"[0-9]{5}KT", self._s_metar_data)
@@ -458,9 +460,9 @@ class SMetar:
             self._i_wind_vel_mps = int(round(self._i_wind_vel_kt * df.DF_KT2MPS, 0))
 
             # logger
-            M_LOG.debug("Wind: Winds from %d° at %d knots (%d mps).", self._i_wind_dir,
-                                                                      self._i_wind_vel_kt,
-                                                                      self._i_wind_vel_mps)
+            # M_LOG.info("Wind: Winds from %d° at %d knots (%d mps).", self._i_wind_dir,
+            #                                                          self._i_wind_vel_kt,
+            #                                                          self._i_wind_vel_mps)
 
         # search for gust (mps)
         l_results = re.search(r"[0-9]{5}G[0-9]{2}MPS", self._s_metar_data)
@@ -479,10 +481,10 @@ class SMetar:
             self._i_gust_kt = int(round(self._i_gust_mps * df.DF_MPS2KT, 0))
 
             # logger
-            M_LOG.debug("Wind: Winds from %d° at %d mps with gusts up to %d mps (%d knots).", self._i_wind_dir,
-                                                                                              self._i_wind_vel_mps,
-                                                                                              self._i_gust_mps,
-                                                                                              self._i_gust_kt)
+            # M_LOG.info("Wind: Winds from %d° at %d mps with gusts up to %d mps (%d knots).", self._i_wind_dir,
+            #                                                                                  self._i_wind_vel_mps,
+            #                                                                                  self._i_gust_mps,
+            #                                                                                  self._i_gust_kt)
 
         # search for gust (kt)
         l_results = re.search(r"[0-9]{5}G[0-9]{2}KT", self._s_metar_data)
@@ -501,10 +503,10 @@ class SMetar:
             self._i_gust_mps = int(round(self._i_gust_kt * df.DF_KT2MPS, 0))
 
             # logger
-            M_LOG.debug("Wind: Winds from %d° at %d knots with gusts up to %d knots (%d mps).", self._i_wind_dir,
-                                                                                                self._i_wind_vel_kt,
-                                                                                                self._i_gust_kt,
-                                                                                                self._i_gust_mps)
+            # M_LOG.info("Wind: Winds from %d° at %d knots with gusts up to %d knots (%d mps).", self._i_wind_dir,
+            #                                                                                    self._i_wind_vel_kt,
+            #                                                                                    self._i_gust_kt,
+            #                                                                                    self._i_gust_mps)
 
         # search for min/max (kt)
         l_results = re.search(r"[0-9]{3}V[0-9]{3}", self._s_metar_data)
@@ -516,8 +518,8 @@ class SMetar:
             self._i_wind_dir_max = int(l_results[0][4:])
 
             # logger
-            M_LOG.debug("Variable winds direction between %d° and %d°.", self._i_wind_dir_min,
-                                                                         self._i_wind_dir_max)
+            # M_LOG.info("Variable winds direction between %d° and %d°.", self._i_wind_dir_min,
+            #                                                             self._i_wind_dir_max)
 
         # search for variable (kt)
         l_results = re.search(r"VRB[0-9]{2}MPS", self._s_metar_data)
@@ -529,7 +531,7 @@ class SMetar:
             self._i_wind_var_kt = int(round(self._i_wind_var_mps * df.DF_MPS2KT, 0))
 
             # logger
-            M_LOG.debug("Variable winds directions at %d mps (%d knots).", self._i_wind_var_mps,
+            # M_LOG.info("Variable winds directions at %d mps (%d knots).", self._i_wind_var_mps,
                                                                            self._i_wind_var_kt)
 
         # search for variable (kt)
@@ -542,8 +544,8 @@ class SMetar:
             self._i_wind_var_mps = int(round(self._i_wind_var_kt * df.DF_KT2MPS, 0))
 
             # logger
-            M_LOG.debug("Variable winds directions at %d knots (%d mps).", self._i_wind_var_kt,
-                                                                           self._i_wind_var_mps)
+            # M_LOG.info("Variable winds directions at %d knots (%d mps).", self._i_wind_var_kt,
+            #                                                               self._i_wind_var_mps)
 
     # ---------------------------------------------------------------------------------------------
     def cut_id(self):
