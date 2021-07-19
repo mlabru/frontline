@@ -42,7 +42,7 @@ M_LOG.setLevel(df.DI_LOG_LEVEL)
 #
 #        # senão,...
 #        else:
-#            # station lat/lng
+#            # station lat/lng/0
 #            df.DDCT_STATIONS_LL[ldct_station["CD_ESTACAO"]] = (float(ldct_station["VL_LATITUDE"]),
 #                                                               float(ldct_station["VL_LONGITUDE"]), 0.)
 
@@ -73,7 +73,7 @@ if 200 == response.status_code:
 
         # senão,...
         else:
-            # station lat/lng
+            # station lat/lng/0
             df.DDCT_STATIONS_LL[ldct_station["CD_ESTACAO"]] = (float(ldct_station["VL_LATITUDE"]),
                                                                float(ldct_station["VL_LONGITUDE"]), 0.)
 

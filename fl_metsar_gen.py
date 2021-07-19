@@ -26,7 +26,7 @@ def grp_qnh(fdct_reg, ff_altitude, fo_metaf):
     group QNH
 
     :param fdct_reg (dict): station register
-    :param ff_altitude (float): station altitude (ft)
+    :param ff_altitude (float): station altitude (m)
     :param fo_metaf (SMETAR): METAR from model
     """
     # pressão atmosférica ao nível da estação (mB)
@@ -34,7 +34,7 @@ def grp_qnh(fdct_reg, ff_altitude, fo_metaf):
 
     if l_qfe:
         # QNH
-        lf_qnh = float(l_qfe) * math.exp(5.2561 * math.log(288 / (288 - 0.0065 * (ff_altitude * df.DF_FT2M))))
+        lf_qnh = float(l_qfe) * math.exp(5.2561 * math.log(288 / (288 - 0.0065 * ff_altitude)))
 
     # senão,...
     else:
@@ -208,7 +208,7 @@ def make_metsar(fs_file, fs_icao_code, fdct_reg, ff_altitude, fo_metaf):
     :param fs_file (str): carrapato filename
     :param fs_icao_code (str): aerodrome ICAO Code
     :param fdct_reg (dict): register
-    :param ff_altitude (float): station altitude (ft)
+    :param ff_altitude (float): station altitude (m)
     :param fo_metaf (SMETAR): METAR from model
     """
     # output filename
