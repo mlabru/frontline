@@ -420,10 +420,10 @@ class SMetar:
 
             # for all messages...
             self._s_weather_text = df.DDCT_WEATHER.get(self._s_weather, None)
-            
+
             if self._s_weather_text:
                 pass
-                 
+
                 # logger
                 # M_LOG.info("Weather: %s.", str(self._s_weather_text))
 
@@ -532,7 +532,7 @@ class SMetar:
 
             # logger
             # M_LOG.info("Variable winds directions at %d mps (%d knots).", self._i_wind_var_mps,
-                                                                           self._i_wind_var_kt)
+            #                                                               self._i_wind_var_kt)
 
         # search for variable (kt)
         l_results = re.search(r"VRB[0-9]{2}KT", self._s_metar_data)

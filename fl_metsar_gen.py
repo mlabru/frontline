@@ -69,7 +69,7 @@ def grp_temp(fdct_reg, fo_metaf):
     else:
         # sem temperatura (!!!REVER!!!)
         li_tabs = 0
-        
+
     # format
     ls_tabs = "{:02d}".format(abs(li_tabs))
 
@@ -94,7 +94,7 @@ def grp_temp(fdct_reg, fo_metaf):
     else:
         # sem temperatura (!!!REVER!!!)
         li_tpo = 0
-        
+
     # format
     ls_tpo = "{:02d}".format(abs(li_tpo))
 
@@ -115,9 +115,9 @@ def grp_time(fdct_reg):
     """
     # return group time
     return "{}{}Z".format(fdct_reg["DT_MEDICAO"][-2:],
-                          fdct_reg["HR_MEDICAO"]), 
-                          fdct_reg["DT_MEDICAO"][-2:],
-                          fdct_reg["HR_MEDICAO"]
+                          fdct_reg["HR_MEDICAO"]), \
+           fdct_reg["DT_MEDICAO"][-2:], \
+           fdct_reg["HR_MEDICAO"]
 
 # -------------------------------------------------------------------------------------------------
 def grp_vis(fo_metaf):
@@ -235,10 +235,11 @@ def make_metsar(fs_file, fs_icao_code, fdct_reg, ff_altitude, fo_metaf, f_bdc):
     # create output file
     with open (pathlib.PurePath(df.DS_OUT_DIR).joinpath(ls_out), "w") as lfh_out:
         # time
-        ls_time, ls_day, ls_time = grp_time(fdct_reg)
+        ls_time, ls_day, ls_hour = grp_time(fdct_reg)
+
         # wind
         ls_wind, li_wvel, li_wdir, li_wraj = grp_wind(fdct_reg, fo_metaf)
-        
+
         # visibility
         ls_vis, li_vis = grp_vis(fo_metaf)
 
@@ -257,8 +258,8 @@ def make_metsar(fs_file, fs_icao_code, fdct_reg, ff_altitude, fo_metaf, f_bdc):
                                                          ls_qnh))
 
         # write METSAR to BDC
-        sb.send_metsar_to_bdc(fo_metsar, 
-                              ls_day, ls_time,
+        sb.send_metsar_to_bdc(fs_icao_code,
+                              ls_day, ls_hour,
                               li_tabs, li_tpo,
                               li_wvel, li_wdir, li_wraj,
                               li_vis,
