@@ -21,6 +21,7 @@ import fl_defs as df
 import fl_icao_ll as ll
 import fl_metsar_gen as mg
 import fl_metar_parser as mp
+import fl_send_bdc as sb
 
 # < module data >----------------------------------------------------------------------------------
 
@@ -71,16 +72,20 @@ def make_metaf(fs_file):
                     pathlib.PurePath(df.DS_OUT_DIR).joinpath(ls_out))
 
 # -------------------------------------------------------------------------------------------------
-def trata_carrapato(fdt_gmt, fs_file):
+def trata_carrapato(fdt_gmt, fs_file, f_bdc):
     """
     trata carrapato
 
     :param fdt_gmt (datetime): date GMT
     :param fs_file (str): carrapato filename
+    :param f_bdc (conn): connection to BDC
     """
     # get metar data
     lo_metar = mp.metar_parse(fs_file)
     assert lo_metar
+
+    # save to BDC
+    sb.send_metaf_to_bdc(f_bdc, lo_metar)
 
     # filename
     ls_file = pathlib.PurePath(fs_file).name
@@ -135,10 +140,17 @@ def main():
     # format full date
     ls_date = ldt_now_gmt.strftime("%Y%m%d%H")
 
+    # connect BDC
+    l_bdc = sb.connect_bdc()
+    assert l_bdc
+
     # find all stations in directory...
     for ls_file in glob.glob("{}/saida_carrapato_????_{}.txt".format(df.DS_TICKS_DIR, ls_date)):
         # trata carrapato
-        trata_carrapato(ldt_now_gmt, ls_file)
+        trata_carrapato(ldt_now_gmt, ls_file, l_bdc)
+
+    # close BDC
+    l_bdc.close()
 
 # -------------------------------------------------------------------------------------------------
 # this is the bootstrap process
