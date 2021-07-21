@@ -30,9 +30,9 @@ M_LOG = logging.getLogger(__name__)
 M_LOG.setLevel(df.DI_LOG_LEVEL)
 
 # -------------------------------------------------------------------------------------------------
-def make_metar(fs_file, fs_icao_code, fs_hour, flst_dados_hora, ff_altitude, fo_metar):
+def make_metsar_from_data(fs_file, fs_icao_code, fs_hour, flst_dados_hora, ff_altitude, fo_metar, f_bdc):
     """
-    generate METAR file
+    generate METSAR from data
 
     :param fs_file (str): carrapato filename
     :param fs_icao_code (str): aerodrome ICAO Code
@@ -40,27 +40,28 @@ def make_metar(fs_file, fs_icao_code, fs_hour, flst_dados_hora, ff_altitude, fo_
     :param flst_dados_hora (str): station data register
     :param ff_altitude (float): station altitude (ft)
     :param fo_metar (SMETAR): METAR from carrapato
+    :param f_bdc (conn): connection to BDC
     """
     # for all station data...
     for ldct_reg in flst_dados_hora:
         # right hour ?
         if fs_hour == ldct_reg["HR_MEDICAO"].strip():
             # gera METAR da registro
-            mg.make_metsar(fs_file, fs_icao_code, ldct_reg, ff_altitude, fo_metar)
+            mg.make_metsar(fs_file, fs_icao_code, ldct_reg, ff_altitude, fo_metar, f_bdc)
             # quit
             break
 
     # senão,...
     else:
-        # gera METAR do carrapato
-        make_metaf(fs_file)
+        # gera METSAR from carrapato
+        make_metsar_from_file(fs_file)
         # logger
         M_LOG.error("station hour not found. METAR from model.")
 
 # -------------------------------------------------------------------------------------------------
-def make_metaf(fs_file):
+def make_metsar_from_file(fs_file):
     """
-    generate METAR file from carrapato
+    generate METSAR from carrapato file
 
     :param fs_file (str): carrapato filename
     """
@@ -81,11 +82,11 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
     :param f_bdc (conn): connection to BDC
     """
     # get metar data
-    lo_metar = mp.metar_parse(fs_file)
-    assert lo_metar
+    lo_metaf = mp.metar_parse(fs_file)
+    assert lo_metaf
 
     # save to BDC
-    sb.send_metaf_to_bdc(f_bdc, lo_metar)
+    sb.send_metaf_to_bdc(lo_metaf, f_bdc)
 
     # filename
     ls_file = pathlib.PurePath(fs_file).name
@@ -107,10 +108,10 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
 
     # ok ?
     if ls_station is None:
-        # gera METAR do carrapato
-        make_metaf(ls_file)
+        # gera METAF from carrapato
+        make_metsar_from_file(ls_file)
         # logger
-        M_LOG.error("near station not found. METAR from model.")
+        M_LOG.error("near station not found. METAF from model.")
         # return
         return
 
@@ -120,14 +121,14 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
     # ok ?
     if 200 == l_response.status_code:
         # make metar from station data
-        make_metar(ls_file, ls_icao_code, ls_hour, json.loads(l_response.text), lf_altitude, lo_metar)
+        make_metsar_from_data(ls_file, ls_icao_code, ls_hour, json.loads(l_response.text), lf_altitude, lo_metaf, f_bdc)
 
     # senão,...
     else:
-        # gera METAR do carrapato
-        make_metaf(ls_file)
+        # gera METAF from carrapato
+        make_metsar_from_file(ls_file)
         # logger
-        M_LOG.error("station data not found. METAR from model.")
+        M_LOG.error("station data not found. METAF from model.")
 
 # -------------------------------------------------------------------------------------------------
 def main():

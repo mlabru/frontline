@@ -13,6 +13,7 @@ import pathlib
 
 # local
 import fl_defs as df
+import fl_send_bdc as sb
 
 # < module data >----------------------------------------------------------------------------------
 
@@ -34,7 +35,7 @@ def grp_qnh(fdct_reg, ff_altitude, fo_metaf):
 
     if l_qfe:
         # QNH
-        lf_qnh = float(l_qfe) * math.exp(5.2561 * math.log(288 / (288 - 0.0065 * ff_altitude)))
+        lf_qnh = float(l_qfe) * math.exp(5.2561 * math.log(288 / (288 - (0.0065 * ff_altitude))))
 
     # senão,...
     else:
@@ -42,7 +43,7 @@ def grp_qnh(fdct_reg, ff_altitude, fo_metaf):
         lf_qnh = fo_metaf.i_pressure_hpa
 
     # return group QNH
-    return "Q{:04d}".format(int(lf_qnh))
+    return "Q{:04d}".format(int(lf_qnh)), int(lf_qnh)
 
 # -------------------------------------------------------------------------------------------------
 def grp_temp(fdct_reg, fo_metaf):
@@ -103,7 +104,7 @@ def grp_temp(fdct_reg, fo_metaf):
         ls_tpo = 'M' + ls_tpo
 
     # return group temp
-    return "{}/{}".format(ls_tabs, ls_tpo)
+    return "{}/{}".format(ls_tabs, ls_tpo), li_tabs, li_tpo
 
 # -------------------------------------------------------------------------------------------------
 def grp_time(fdct_reg):
@@ -114,7 +115,9 @@ def grp_time(fdct_reg):
     """
     # return group time
     return "{}{}Z".format(fdct_reg["DT_MEDICAO"][-2:],
-                          fdct_reg["HR_MEDICAO"])
+                          fdct_reg["HR_MEDICAO"]), 
+                          fdct_reg["DT_MEDICAO"][-2:],
+                          fdct_reg["HR_MEDICAO"]
 
 # -------------------------------------------------------------------------------------------------
 def grp_vis(fo_metaf):
@@ -123,18 +126,32 @@ def grp_vis(fo_metaf):
 
     :param fo_metaf (SMETAR): METAR from model
     """
-    # ceiling and visibility ok ?
-    if fo_metaf.v_cavok:
-        # visibility
-        ls_vis = "CAVOK"
+    # visibility
+    ls_vis = ""
 
-    # visibility ?
-    elif fo_metaf.i_visibility:
+    # visibility
+    li_vis = -99999
+
+    # have visibility ?
+    if fo_metaf.i_visibility is None:
+        # ceiling and visibility ok ?
+        if fo_metaf.v_cavok:
+            # visibility
+            ls_vis = "CAVOK"
+
+            # visibility
+            li_vis = 99999
+
+    # senão, have visibility
+    else:
         # visibility
         ls_vis = "{:04d}".format(fo_metaf.i_visibility)
 
+        # visibility
+        li_vis = fo_metaf.i_visibility
+
     # return group visibility
-    return ls_vis
+    return ls_vis, li_vis
 
 # -------------------------------------------------------------------------------------------------
 def grp_wind(fdct_reg, fo_metaf):
@@ -198,10 +215,10 @@ def grp_wind(fdct_reg, fo_metaf):
         ls_wind += "{:02d}".format(li_wraj) if li_wraj < 100 else "P99"
 
     # return group wind
-    return "{}KT".format(ls_wind)
+    return "{}KT".format(ls_wind), li_wvel, li_wdir, li_wraj
 
 # -------------------------------------------------------------------------------------------------
-def make_metsar(fs_file, fs_icao_code, fdct_reg, ff_altitude, fo_metaf):
+def make_metsar(fs_file, fs_icao_code, fdct_reg, ff_altitude, fo_metaf, f_bdc):
     """
     generate METSAR file from ensemble
 
@@ -210,18 +227,42 @@ def make_metsar(fs_file, fs_icao_code, fdct_reg, ff_altitude, fo_metaf):
     :param fdct_reg (dict): register
     :param ff_altitude (float): station altitude (m)
     :param fo_metaf (SMETAR): METAR from model
+    :param f_bdc (conn): connection to BDC
     """
     # output filename
     ls_out = fs_file.replace("carrapato", "frontline")
 
     # create output file
     with open (pathlib.PurePath(df.DS_OUT_DIR).joinpath(ls_out), "w") as lfh_out:
+        # time
+        ls_time, ls_day, ls_time = grp_time(fdct_reg)
+        # wind
+        ls_wind, li_wvel, li_wdir, li_wraj = grp_wind(fdct_reg, fo_metaf)
+        
+        # visibility
+        ls_vis, li_vis = grp_vis(fo_metaf)
+
+        # temperature
+        ls_temp, li_tabs, li_tpo = grp_temp(fdct_reg, fo_metaf)
+
+        # pressure
+        ls_qnh, li_qnh = grp_qnh(fdct_reg, ff_altitude, fo_metaf)
+
         # write output file
         lfh_out.write("METSAR {} {} {} {} {} {}=".format(fs_icao_code,
-                                                         grp_time(fdct_reg),
-                                                         grp_wind(fdct_reg, fo_metaf),
-                                                         grp_vis(fo_metaf),
-                                                         grp_temp(fdct_reg, fo_metaf),
-                                                         grp_qnh(fdct_reg, ff_altitude, fo_metaf)))
+                                                         ls_time,
+                                                         ls_wind,
+                                                         ls_vis,
+                                                         ls_temp,
+                                                         ls_qnh))
+
+        # write METSAR to BDC
+        sb.send_metsar_to_bdc(fo_metsar, 
+                              ls_day, ls_time,
+                              li_tabs, li_tpo,
+                              li_wvel, li_wdir, li_wraj,
+                              li_vis,
+                              li_qnh,
+                              f_bdc)
 
 # < the end >--------------------------------------------------------------------------------------
