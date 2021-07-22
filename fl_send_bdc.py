@@ -14,12 +14,6 @@ import psycopg2
 
 # < defines >--------------------------------------------------------------------------------------
 
-# ft -> m
-#DF_FT2M = 0.3048
-
-# m/s -> kt
-#DF_MS2KT = 1.943844492
-
 # DB connection
 DS_HOST = "172.18.30.21"
 DS_USER = "dwclimatologia"
@@ -76,13 +70,13 @@ def send_metaf_to_bdc(fo_metaf, f_bdc):
                fo_metaf.s_icao_code,
                ldt_date,
                ldt_time,
-               fo_metaf.i_temperature_c,
-               fo_metaf.i_dewpoint_c,
-               fo_metaf.i_wind_vel_kt,
-               fo_metaf.i_wind_dir,
-               fo_metaf.i_gust_kt,
+               fo_metaf.i_temperature_c if fo_metaf.i_temperature_c is not None else "null",
+               fo_metaf.i_dewpoint_c if fo_metaf.i_dewpoint_c is not None else "null",
+               fo_metaf.i_wind_vel_kt if fo_metaf.i_wind_vel_kt is not None else "null",
+               fo_metaf.i_wind_dir if fo_metaf.i_wind_dir is not None else "null",
+               fo_metaf.i_gust_kt if fo_metaf.i_gust_kt is not None else "null",
                li_vis,
-               fo_metaf.i_pressure_hpa
+               fo_metaf.i_pressure_hpa if fo_metaf.i_pressure_hpa is not None else "null"
                )
 
     # execute query

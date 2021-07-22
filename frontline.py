@@ -104,7 +104,7 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
 
     # get closer station
     ls_station, lf_altitude = ll.find_near_station(ls_icao_code)
-    M_LOG.info("near station: %s @ %s (m)", str(ls_station), str(lf_altitude))
+    M_LOG.info("near station of %s: %s @ %s (m)", str(ls_icao_code), str(ls_station), str(lf_altitude))
 
     # ok ?
     if ls_station is None:

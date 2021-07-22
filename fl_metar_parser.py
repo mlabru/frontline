@@ -630,6 +630,9 @@ def _get_metar_data(fs_station_file):
         # load file
         ls_line = lfh_md.read()
 
+    if ls_line.startswith("METAF") or ls_line.startswith("METAR"):
+        ls_line = ls_line[5:].strip()
+
     # return
     return ls_line
 
