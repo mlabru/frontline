@@ -72,7 +72,7 @@ def send_metaf_to_bdc(fo_metaf, f_bdc):
     # make query
     ls_query = "insert into metaf(sigla_aerodromo, dt_metaf, hr_metaf, temperatura_ar, " \
                "temperatura_po, velocidade_vento, direcao_vento, rajada, visibilidade, " \
-               "qnh) values ('{}', {}, {}, {}, {}, {}, {}, {}, {}, {})".format(
+               "qnh) values ('{}', '{}', '{}', {}, {}, {}, {}, {}, {}, {})".format(
                fo_metaf.s_icao_code,
                ldt_date,
                ldt_time,
@@ -111,7 +111,7 @@ def send_metsar_to_bdc(fs_icao_code, fs_day, fs_time, fi_tabs, fi_tpo,
     # make query
     ls_query = "insert into metsar(sigla_aerodromo, dt_metsar, hr_metsar, temperatura_ar, " \
                "temperatura_po, velocidade_vento, direcao_vento, rajada, visibilidade, " \
-               "qnh) values ({}, {}, {}, {}, {}, {}, {}, {}, {}, {})".format(
+               "qnh) values ('{}', '{}', '{}', {}, {}, {}, {}, {}, {}, {})".format(
                fs_icao_code,
                ldt_date, ldt_time,
                fi_tabs, fi_tpo,
