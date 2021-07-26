@@ -625,16 +625,18 @@ def _get_metar_data(fs_station_file):
     """
     read a string from a file with a metar
     """
-    # open carrapato for read metar data
+    # open carrapato for read metaf data
     with open(fs_station_file, "r") as lfh_md:
         # load file
         ls_line = lfh_md.read()
 
+    # METAF or METAR data ?
     if ls_line.startswith("METAF") or ls_line.startswith("METAR"):
-        ls_line = ls_line[5:].strip()
+        # get metar data
+        ls_line = ls_line[5:]
 
     # return
-    return ls_line
+    return ls_line.strip()
 
 # -------------------------------------------------------------------------------------------------
 def metar_parse(fs_station_file):
