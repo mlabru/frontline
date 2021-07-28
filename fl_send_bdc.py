@@ -8,9 +8,13 @@ fl_send_bdc
 
 # python library
 import datetime
+import logging
 
 # postgres
 import psycopg2
+
+# local
+import fl_defs as df
 
 # < defines >--------------------------------------------------------------------------------------
 
@@ -20,8 +24,14 @@ DS_USER = "dwclimatologia"
 DS_PASS = "dwclimatologia"
 DS_DB = "dw_climatologia"
 
+# < module data >----------------------------------------------------------------------------------
+
+# logger
+M_LOG = logging.getLogger(__name__)
+M_LOG.setLevel(df.DI_LOG_LEVEL)
+
 # -------------------------------------------------------------------------------------------------
-def connect_bdc(fs_user=DS_USER, fs_pass=DS_PASS, fs_host=DS_HOST, fs_db=DS_DB):
+def bdc_connect(fs_user=DS_USER, fs_pass=DS_PASS, fs_host=DS_HOST, fs_db=DS_DB):
     """
     connect to BDC
     """
@@ -33,14 +43,10 @@ def connect_bdc(fs_user=DS_USER, fs_pass=DS_PASS, fs_host=DS_HOST, fs_db=DS_DB):
     return l_bdc
 
 # -------------------------------------------------------------------------------------------------
-def send_metaf_to_bdc(fo_metaf, f_bdc):
+def bdc_save_metaf(fo_metaf, f_bdc):
     """
     write metaf data to BDC
     """
-    # create cursor
-    l_cursor = f_bdc.cursor()
-    assert l_cursor
-
     # convert date & time
     ldt_today = datetime.date.today()
 
@@ -79,22 +85,16 @@ def send_metaf_to_bdc(fo_metaf, f_bdc):
                fo_metaf.i_pressure_hpa if fo_metaf.i_pressure_hpa is not None else "null"
                )
 
-    # execute query
-    l_cursor.execute(ls_query)
-
-    # commit
-    f_bdc.commit()
+    # write to BDC
+    bdc_write(f_bdc, ls_query)
+    M_LOG.info("save metaf: %s", str(ls_query))
 
 # -------------------------------------------------------------------------------------------------
-def send_metsar_to_bdc(fs_icao_code, fs_day, fs_time, fi_tabs, fi_tpo,
-                       fi_wvel, fi_wdir, fi_wraj, fi_vis, fi_qnh, f_bdc):
+def bdc_save_metsar(fs_icao_code, fs_day, fs_time, fi_tabs, fi_tpo,
+                    fi_wvel, fi_wdir, fi_wraj, fi_vis, fi_qnh, f_bdc):
     """
     write metsar data to BDC
     """
-    # create cursor
-    l_cursor = f_bdc.cursor()
-    assert l_cursor
-
     # convert date & time
     ldt_today = datetime.date.today()
 
@@ -114,8 +114,21 @@ def send_metsar_to_bdc(fs_icao_code, fs_day, fs_time, fi_tabs, fi_tpo,
                fi_qnh,
                )
 
+    # write to BDC
+    bdc_write(f_bdc, ls_query)
+    M_LOG.info("save metsar: %s", str(ls_query))
+
+# -------------------------------------------------------------------------------------------------
+def bdc_write(f_bdc, fs_query):
+    """
+    execute query on BDC
+    """
+    # create cursor
+    l_cursor = f_bdc.cursor()
+    assert l_cursor
+
     # execute query
-    l_cursor.execute(ls_query)
+    l_cursor.execute(fs_query)
 
     # commit
     f_bdc.commit()

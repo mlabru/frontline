@@ -28,7 +28,7 @@ def grp_qnh(fdct_reg, ff_altitude, fo_metaf):
 
     :param fdct_reg (dict): station register
     :param ff_altitude (float): station altitude (m)
-    :param fo_metaf (SMETAR): METAR from model
+    :param fo_metaf (SMETAR): METAR from model (METAF)
     """
     # pressão atmosférica ao nível da estação (mB)
     l_qfe = fdct_reg.get("PRE_INS", None)
@@ -51,7 +51,7 @@ def grp_temp(fdct_reg, fo_metaf):
     group temp
 
     :param fdct_reg (dict): station register
-    :param fo_metaf (SMETAR): METAR from model
+    :param fo_metaf (SMETAR): METAR from model (METAF)
     """
     # temperatura do ar - bulbo seco
     l_tabs = fdct_reg.get("TEM_INS", None)
@@ -124,7 +124,7 @@ def grp_vis(fo_metaf):
     """
     group visibility
 
-    :param fo_metaf (SMETAR): METAR from model
+    :param fo_metaf (SMETAR): METAR from model (METAF)
     """
     # visibility
     ls_vis = ""
@@ -159,7 +159,7 @@ def grp_wind(fdct_reg, fo_metaf):
     group wind
 
     :param fdct_reg (dict): station register
-    :param fo_metaf (SMETAR): METAR from model
+    :param fo_metaf (SMETAR): METAR from model (METAF)
     """
     # vento, direção
     l_wdir = fdct_reg.get("VEN_DIR", None)
@@ -174,7 +174,7 @@ def grp_wind(fdct_reg, fo_metaf):
         li_wdir = fo_metaf.i_wind_dir
 
     # group wind
-    ls_wind = "{:03d}".format(li_wdir)
+    ls_wind = "{:03d}".format((li_wdir // 10) * 10)
 
     # vento, velocidade
     l_wvel = fdct_reg.get("VEN_VEL", None)
@@ -226,7 +226,7 @@ def make_metsar(fs_file, fs_icao_code, fdct_reg, ff_altitude, fo_metaf, f_bdc):
     :param fs_icao_code (str): aerodrome ICAO Code
     :param fdct_reg (dict): register
     :param ff_altitude (float): station altitude (m)
-    :param fo_metaf (SMETAR): METAR from model
+    :param fo_metaf (SMETAR): METAR from model (METAF)
     :param f_bdc (conn): connection to BDC
     """
     # output filename
@@ -258,12 +258,12 @@ def make_metsar(fs_file, fs_icao_code, fdct_reg, ff_altitude, fo_metaf, f_bdc):
                                                          ls_qnh))
 
         # write METSAR to BDC
-        sb.send_metsar_to_bdc(fs_icao_code,
-                              ls_day, ls_hour,
-                              li_tabs, li_tpo,
-                              li_wvel, li_wdir, li_wraj,
-                              li_vis,
-                              li_qnh,
-                              f_bdc)
+        sb.bdc_save_metsar(fs_icao_code,
+                           ls_day, ls_hour,
+                           li_tabs, li_tpo,
+                           li_wvel, li_wdir, li_wraj,
+                           li_vis,
+                           li_qnh,
+                           f_bdc)
 
 # < the end >--------------------------------------------------------------------------------------
