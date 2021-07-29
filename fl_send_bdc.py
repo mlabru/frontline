@@ -90,6 +90,53 @@ def bdc_save_metaf(fo_metaf, f_bdc):
     M_LOG.debug("save metaf: %s", str(ls_query))
 
 # -------------------------------------------------------------------------------------------------
+def bdc_save_metar(fo_metar, f_bdc):
+    """
+    write metar data to BDC
+    """
+    # convert date & time
+    ldt_today = datetime.date.today()
+
+    # metar date
+    ls_day = fo_metar.s_forecast_time[:2]
+    ls_hour = fo_metar.s_forecast_time[2:4]
+    ls_min = fo_metar.s_forecast_time[4:6]
+
+    # build date & time
+    ldt_date = datetime.date(ldt_today.year, ldt_today.month, int(ls_day))
+    ldt_time = datetime.time(int(ls_hour), int(ls_min))
+
+    # have visibility ?
+    if fo_metar.i_visibility is None:
+        # visibility
+        li_vis = 99999 if fo_metar.v_cavok else -99999
+
+    # senão, have visibility
+    else:
+        # visibility
+        li_vis = fo_metar.i_visibility
+
+    # make query
+    ls_query = "insert into metar(sigla_aerodromo, dt_metar, hr_metar, temperatura_ar, " \
+               "temperatura_po, velocidade_vento, direcao_vento, rajada, visibilidade, " \
+               "qnh) values ('{}', '{}', '{}', {}, {}, {}, {}, {}, {}, {})".format(
+               fo_metar.s_icao_code,
+               ldt_date,
+               ldt_time,
+               fo_metar.i_temperature_c if fo_metar.i_temperature_c is not None else "null",
+               fo_metar.i_dewpoint_c if fo_metar.i_dewpoint_c is not None else "null",
+               fo_metar.i_wind_vel_kt if fo_metar.i_wind_vel_kt is not None else "null",
+               fo_metar.i_wind_dir if fo_metar.i_wind_dir is not None else "null",
+               fo_metar.i_gust_kt if fo_metar.i_gust_kt is not None else "null",
+               li_vis,
+               fo_metar.i_pressure_hpa if fo_metar.i_pressure_hpa is not None else "null"
+               )
+
+    # write to BDC
+    bdc_write(f_bdc, ls_query)
+    M_LOG.debug("save metar: %s", str(ls_query))
+
+# -------------------------------------------------------------------------------------------------
 def bdc_save_metsar(fs_icao_code, fs_day, fs_time, fi_tabs, fi_tpo,
                     fi_wvel, fi_wdir, fi_wraj, fi_vis, fi_qnh, f_bdc):
     """

@@ -54,22 +54,41 @@ def grp_temp(fdct_reg, fo_metaf):
     :param fdct_reg (dict): station register
     :param fo_metaf (SMETAR): METAR from model (METAF)
     """
-    # temperatura do ar - bulbo seco
-    l_tabs = fdct_reg.get("TEM_INS", None)
+    # temperatura do ar (bulbo seco) da estação
+    l_tabs_stat = fdct_reg.get("TEM_INS", None)
 
-    if l_tabs is not None:
+    # nenhuma temperatura ?
+    if (l_tabs_stat is None) and (fo_metaf.i_temperature_c is None):
+        # sem temperatura (!!!REVER!!!)
+        li_tabs = 0
+
+    # só temperatura da estação ?
+    elif (l_tabs_stat is not None) and (fo_metaf.i_temperature_c is None):
         # convert to int
-        li_tabs = int(float(l_tabs))
+        li_tabs = int(float(l_tabs_stat))
 
-    # senão,...
-    elif fo_metaf.i_temperature_c is not None:
+    # só temperatura do modelo ?
+    elif (l_tabs_stat is None) and (fo_metaf.i_temperature_c is not None):
         # temperature in °C from model
         li_tabs = fo_metaf.i_temperature_c
 
-    # senão,...
+    # senão, ambas        
     else:
-        # sem temperatura (!!!REVER!!!)
-        li_tabs = 0
+        # convert to int
+        li_tabs_stat = int(float(l_tabs_stat))
+
+        # temperature in °C from model
+        li_tabs_model = fo_metaf.i_temperature_c
+
+        # temperatura da estação no range +- 10° do modelo ?
+        if (li_tabs_model - 10) <= li_tabs_stat <= (li_tabs_model + 10):
+            # temperatura da estação 
+            li_tabs = li_tabs_stat
+
+        # senão, do modelo 
+        else:
+            # temperatura do modelo
+            li_tabs = li_tabs_model
 
     # format
     ls_tabs = "{:02d}".format(abs(li_tabs))
@@ -79,22 +98,41 @@ def grp_temp(fdct_reg, fo_metaf):
         # put an M in front of
         ls_tabs = 'M' + ls_tabs
 
-    # temperatura do ponto de orvalho
-    l_tpo = fdct_reg.get("PTO_INS", None)
+    # temperatura do ponto de orvalho da estação
+    l_tpo_stat = fdct_reg.get("PTO_INS", None)
 
-    if l_tpo is not None:
+    # nenhuma temperatura ?
+    if (l_tpo_stat is None) and (fo_metaf.i_dewpoint_c is None):
+        # sem temperatura (!!!REVER!!!)
+        li_tpo = 0
+
+    # só temperatura da estação ?
+    elif (l_tpo_stat is not None) and (fo_metaf.i_dewpoint_c is None):
         # convert to int
-        li_tpo = int(float(l_tpo))
+        li_tpo = int(float(l_tpo_stat))
 
-    # senão,...
-    elif fo_metaf.i_dewpoint_c is not None:
+    # só temperatura do modelo ?
+    elif (l_tpo_stat is None) and (fo_metaf.i_dewpoint_c is not None):
         # dewpoint in °C from model
         li_tpo = fo_metaf.i_dewpoint_c
 
-    # senão,...
+    # senão, ambas        
     else:
-        # sem temperatura (!!!REVER!!!)
-        li_tpo = 0
+        # convert to int
+        li_tpo_stat = int(float(l_tpo_stat))
+
+        # dewpoint in °C from model
+        li_tpo_model = fo_metaf.i_dewpoint_c
+
+        # temperatura da estação no range +- 10° do modelo ?
+        if (li_tpo_model - 10) <= li_tpo_stat <= (li_tpo_model + 10):
+            # temperatura da estação 
+            li_tpo = li_tpo_stat
+
+        # senão, do modelo 
+        else:
+            # temperatura do modelo
+            li_tpo = li_tpo_model
 
     # format
     ls_tpo = "{:02d}".format(abs(li_tpo))

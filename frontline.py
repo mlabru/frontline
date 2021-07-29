@@ -61,6 +61,9 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
     M_LOG.debug("REDEMET lo_metar: %s", str(lo_metar))
     
     if lo_metar:
+        # save to BDC
+        sb.bdc_save_metar(lo_metar, f_bdc)
+
         # make METSAR from REDEMET data
         mg.make_metsar_from_metar(ls_file, ls_icao_code, lo_metar, lo_metaf, f_bdc)
 
