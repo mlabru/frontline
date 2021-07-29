@@ -357,8 +357,29 @@ def make_metsar_from_metar(fs_file, fs_icao_code, fo_metar, fo_metaf, f_bdc):
         # wind
         ls_wind = fo_metaf.s_wind        if fo_metar.s_wind        is None else fo_metar.s_wind
         li_wvel = fo_metaf.i_wind_vel_kt if fo_metar.i_wind_vel_kt is None else fo_metar.i_wind_vel_kt
-        li_wdir = fo_metaf.i_wind_dir    if fo_metar.i_wind_dir    is None else fo_metar.i_wind_dir
-        li_wraj = fo_metaf.i_gust_kt     if fo_metar.i_gust_kt     is None else fo_metar.i_gust_kt
+
+        # vento sem direção ?
+        if fo_metar.i_wind_dir is None:
+            # vento não variável ?
+            if fo_metar.v_wind_var is None:
+                # direção do modelo 
+                li_wdir = fo_metaf.i_wind_dir
+
+            # senão, variável
+            else:
+                # direção padrão
+                li_wdir = 270
+
+        # senão, vento tem direção
+        else:
+            # direção do METAR
+            li_wdir = fo_metar.i_wind_dir
+ 
+        # rajada
+        li_wraj = fo_metaf.i_gust_kt if fo_metar.i_gust_kt is None else fo_metar.i_gust_kt
+
+        # wind var
+        ls_wind += "" if fo_metar.s_wind_var is None else fo_metar.s_wind_var
 
         # visibility
         ls_vis = fo_metaf.s_visibility if fo_metar.s_visibility is None else fo_metar.s_visibility

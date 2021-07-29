@@ -105,8 +105,8 @@ class SMetar:
         self._i_wind_dir = None
         self._i_wind_dir_max = None
         self._i_wind_dir_min = None
-        self._i_wind_var_kt = None
-        self._i_wind_var_mps = None
+        self._s_wind_var = None
+        self._v_wind_var = None
         self._i_wind_vel_kt = None
         self._i_wind_vel_mps = None
 
@@ -458,6 +458,8 @@ class SMetar:
             # wind
             self._s_wind = l_results[0].strip()
 
+            # wind variable
+            self._i_wind_var = False
             # wind direction
             self._i_wind_dir = int(l_results[0][:3])
             # wind velocity (m/s)
@@ -477,6 +479,8 @@ class SMetar:
             # wind
             self._s_wind = l_results[0].strip()
 
+            # wind variable
+            self._i_wind_var = False
             # wind direction
             self._i_wind_dir = int(l_results[0][:3])
             # wind velocity (kt)
@@ -496,6 +500,8 @@ class SMetar:
             # wind
             self._s_wind = l_results[0].strip()
 
+            # wind variable
+            self._i_wind_var = False
             # wind direction
             self._i_wind_dir = int(l_results[0][:3])
             # wind velocity (m/s)
@@ -521,6 +527,8 @@ class SMetar:
             # wind
             self._s_wind = l_results[0].strip()
 
+            # wind variable
+            self._i_wind_var = False
             # wind direction
             self._i_wind_dir = int(l_results[0][:3])
             # wind velocity (kt)
@@ -543,9 +551,11 @@ class SMetar:
         l_results = re.search(r"[0-9]{3}V[0-9]{3}", self._s_metar_data)
 
         if l_results:
-            # wind
-            self._s_wind = l_results[0].strip()
+            # wind variable
+            self._s_wind_var = l_results[0].strip()
 
+            # wind variable
+            self._i_wind_var = True
             # wind direction min
             self._i_wind_dir_min = int(l_results[0][:3])
             # wind direction max
@@ -559,27 +569,37 @@ class SMetar:
         l_results = re.search(r"VRB[0-9]{2}MPS", self._s_metar_data)
 
         if l_results:
+            # wind variable
+            self._s_wind_var = l_results[0].strip()
+
+            # wind variable
+            self._i_wind_var = True
             # wind velocity (m/s)
-            self._i_wind_var_mps = int(l_results[0][3:-3])
+            self._i_wind_vel_mps = int(l_results[0][3:-3])
             # wind velocity (kt)
-            self._i_wind_var_kt = int(round(self._i_wind_var_mps * df.DF_MPS2KT, 0))
+            self._i_wind_vel_kt = int(round(self._i_wind_vel_mps * df.DF_MPS2KT, 0))
 
             # logger
-            M_LOG.info("Variable winds directions at %d mps (%d knots).", self._i_wind_var_mps,
-                                                                          self._i_wind_var_kt)
+            M_LOG.info("Variable winds directions at %d mps (%d knots).", self._i_wind_vel_mps,
+                                                                          self._i_wind_vel_kt)
 
         # search for variable (kt)
         l_results = re.search(r"VRB[0-9]{2}KT", self._s_metar_data)
 
         if l_results:
+            # wind variable
+            self._s_wind_var = l_results[0].strip()
+
+            # wind variable
+            self._i_wind_var = True
             # wind velocity (kt)
-            self._i_wind_var_kt = int(l_results[0][3:-2])
+            self._i_wind_vel_kt = int(l_results[0][3:-2])
             # wind velocity (m/s)
-            self._i_wind_var_mps = int(round(self._i_wind_var_kt * df.DF_KT2MPS, 0))
+            self._i_wind_vel_mps = int(round(self._i_wind_vel_kt * df.DF_KT2MPS, 0))
 
             # logger
-            M_LOG.info("Variable winds directions at %d knots (%d mps).", self._i_wind_var_kt,
-                                                                          self._i_wind_var_mps)
+            M_LOG.info("Variable winds directions at %d knots (%d mps).", self._i_wind_vel_kt,
+                                                                          self._i_wind_vel_mps)
 
     # ---------------------------------------------------------------------------------------------
     def cut_id(self):
@@ -665,6 +685,18 @@ class SMetar:
     def s_wind(self):
         """wind"""
         return self._s_wind
+
+    # ---------------------------------------------------------------------------------------------
+    @property
+    def s_wind_var(self):
+        """wind"""
+        return self._s_wind_var
+
+    # ---------------------------------------------------------------------------------------------
+    @property
+    def v_wind_var(self):
+        """wind"""
+        return self._v_wind_var
 
     # ---------------------------------------------------------------------------------------------
     @property
