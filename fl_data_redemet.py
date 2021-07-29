@@ -34,9 +34,6 @@ def redemet_get_location(fs_date, fs_location):
     """
     recupera o METAR da localidade
     """
-    # logger
-    print("fs_date = ", fs_date, " fs_location = ", fs_location)
-
     # request de dados horários da estação
     l_response = requests.get(DS_REDEMET_URL.format(DS_REDEMET_KEY, fs_date, fs_location))
 
@@ -65,8 +62,8 @@ def redemet_get_location(fs_date, fs_location):
                         # location METAR
                         ls_mens = ldct_loc.get("mens", None)
                         M_LOG.debug("ls_mens: %s", ls_mens)
-     
-                        if ls_mens:                   
+
+                        if ls_mens:
                             # parse METAR
                             lo_metar = mp.metar_parse(ls_mens.strip())
 
@@ -75,5 +72,5 @@ def redemet_get_location(fs_date, fs_location):
 
     # return error
     return None
-        
+
 # < the end >--------------------------------------------------------------------------------------

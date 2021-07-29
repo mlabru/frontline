@@ -397,7 +397,6 @@ class SMetar:
             if "CAVOK" == l_result[0]:
                 # cavok
                 self._v_cavok = True
-                
 
                 # logger
                 M_LOG.info("Visibility: Ceiling And Visibility OK.")
@@ -465,7 +464,7 @@ class SMetar:
             self._i_wind_vel_mps = int(l_results[0][3:-3])
             # wind velocity (kt)
             self._i_wind_vel_kt = int(round(self._i_wind_vel_mps * df.DF_MPS2KT, 0))
-            
+
             # logger
             M_LOG.info("Wind: Winds from %d° at %d mps (%d knots).", self._i_wind_dir,
                                                                      self._i_wind_vel_mps,

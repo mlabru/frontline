@@ -155,10 +155,13 @@ def bdc_save_metsar(fs_icao_code, fs_day, fs_time, fi_tabs, fi_tpo,
                "qnh) values ('{}', '{}', '{}', {}, {}, {}, {}, {}, {}, {})".format(
                fs_icao_code,
                ldt_date, ldt_time,
-               fi_tabs, fi_tpo,
-               fi_wvel, fi_wdir, fi_wraj,
-               fi_vis,
-               fi_qnh,
+               fi_tabs if fi_tabs is not None else "null",
+               fi_tpo if fi_tpo is not None else "null",
+               fi_wvel if fi_wvel is not None else "null",
+               fi_wdir if fi_wdir is not None else "null",
+               fi_wraj if fi_wraj is not None else "null",
+               fi_vis if fi_vis is not None else "null",
+               fi_qnh if fi_qnh is not None else "null"
                )
 
     # write to BDC

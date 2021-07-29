@@ -72,7 +72,7 @@ def grp_temp(fdct_reg, fo_metaf):
         # temperature in °C from model
         li_tabs = fo_metaf.i_temperature_c
 
-    # senão, ambas        
+    # senão, ambas
     else:
         # convert to int
         li_tabs_stat = int(float(l_tabs_stat))
@@ -82,10 +82,10 @@ def grp_temp(fdct_reg, fo_metaf):
 
         # temperatura da estação no range +- 10° do modelo ?
         if (li_tabs_model - 10) <= li_tabs_stat <= (li_tabs_model + 10):
-            # temperatura da estação 
+            # temperatura da estação
             li_tabs = li_tabs_stat
 
-        # senão, do modelo 
+        # senão, do modelo
         else:
             # temperatura do modelo
             li_tabs = li_tabs_model
@@ -116,7 +116,7 @@ def grp_temp(fdct_reg, fo_metaf):
         # dewpoint in °C from model
         li_tpo = fo_metaf.i_dewpoint_c
 
-    # senão, ambas        
+    # senão, ambas
     else:
         # convert to int
         li_tpo_stat = int(float(l_tpo_stat))
@@ -126,10 +126,10 @@ def grp_temp(fdct_reg, fo_metaf):
 
         # temperatura da estação no range +- 10° do modelo ?
         if (li_tpo_model - 10) <= li_tpo_stat <= (li_tpo_model + 10):
-            # temperatura da estação 
+            # temperatura da estação
             li_tpo = li_tpo_stat
 
-        # senão, do modelo 
+        # senão, do modelo
         else:
             # temperatura do modelo
             li_tpo = li_tpo_model
@@ -293,19 +293,19 @@ def make_metsar_from_list(fs_file, fs_icao_code, fs_hour, flst_data, ff_altitude
             # create output file
             with open (pathlib.PurePath(df.DS_OUT_DIR).joinpath(ls_out), "w") as lfh_out:
                 # time
-                ls_time, ls_day, ls_hour = grp_time(fdct_reg)
+                ls_time, ls_day, ls_hour = grp_time(ldct_reg)
 
                 # wind
-                ls_wind, li_wvel, li_wdir, li_wraj = grp_wind(fdct_reg, fo_metaf)
+                ls_wind, li_wvel, li_wdir, li_wraj = grp_wind(ldct_reg, fo_metaf)
 
                 # visibility
                 ls_vis, li_vis = grp_vis(fo_metaf)
 
                 # temperature
-                ls_temp, li_tabs, li_tpo = grp_temp(fdct_reg, fo_metaf)
+                ls_temp, li_tabs, li_tpo = grp_temp(ldct_reg, fo_metaf)
 
                 # pressure
-                ls_qnh, li_qnh = grp_qnh(fdct_reg, ff_altitude, fo_metaf)
+                ls_qnh, li_qnh = grp_qnh(ldct_reg, ff_altitude, fo_metaf)
 
                 # write output file
                 lfh_out.write("METSAR {} {} {} {} {} {}=".format(fs_icao_code,
