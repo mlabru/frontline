@@ -86,7 +86,7 @@ def bdc_save_metaf(fo_metaf, f_bdc):
                )
 
     # write to BDC
-    # bdc_write(f_bdc, ls_query)
+    bdc_write(f_bdc, ls_query)
     M_LOG.debug("save metaf: %s", str(ls_query))
 
 # -------------------------------------------------------------------------------------------------
@@ -115,7 +115,7 @@ def bdc_save_metsar(fs_icao_code, fs_day, fs_time, fi_tabs, fi_tpo,
                )
 
     # write to BDC
-    # bdc_write(f_bdc, ls_query)
+    bdc_write(f_bdc, ls_query)
     M_LOG.debug("save metsar: %s", str(ls_query))
 
 # -------------------------------------------------------------------------------------------------

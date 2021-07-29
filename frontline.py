@@ -111,8 +111,8 @@ def main():
     ls_date = ldt_now_gmt.strftime("%Y%m%d%H")
 
     # connect BDC
-    l_bdc = None  # sb.bdc_connect()
-    # assert l_bdc
+    l_bdc = sb.bdc_connect()
+    assert l_bdc
 
     # find all stations in directory...
     for ls_file in glob.glob("{}/saida_carrapato_????_{}.txt".format(df.DS_TICKS_DIR, ls_date)):
@@ -120,7 +120,7 @@ def main():
         trata_carrapato(ldt_now_gmt, ls_file, l_bdc)
 
     # close BDC
-    # l_bdc.close()
+    l_bdc.close()
 
 # -------------------------------------------------------------------------------------------------
 # this is the bootstrap process
