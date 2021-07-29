@@ -106,7 +106,6 @@ class SMetar:
         self._i_wind_dir_max = None
         self._i_wind_dir_min = None
         self._s_wind_var = None
-        self._v_wind_var = None
         self._i_wind_vel_kt = None
         self._i_wind_vel_mps = None
 
@@ -458,12 +457,10 @@ class SMetar:
             # wind
             self._s_wind = l_results[0].strip()
 
-            # wind variable
-            self._i_wind_var = False
             # wind direction
             self._i_wind_dir = int(l_results[0][:3])
             # wind velocity (m/s)
-            self._i_wind_vel_mps = int(l_results[0][3:-3])
+            self._i_wind_vel_mps = int(l_results[0][3:2])
             # wind velocity (kt)
             self._i_wind_vel_kt = int(round(self._i_wind_vel_mps * df.DF_MPS2KT, 0))
 
@@ -479,12 +476,10 @@ class SMetar:
             # wind
             self._s_wind = l_results[0].strip()
 
-            # wind variable
-            self._i_wind_var = False
             # wind direction
             self._i_wind_dir = int(l_results[0][:3])
             # wind velocity (kt)
-            self._i_wind_vel_kt = int(l_results[0][3:-2])
+            self._i_wind_vel_kt = int(l_results[0][3:5])
             # wind velocity (m/s)
             self._i_wind_vel_mps = int(round(self._i_wind_vel_kt * df.DF_KT2MPS, 0))
 
@@ -500,8 +495,6 @@ class SMetar:
             # wind
             self._s_wind = l_results[0].strip()
 
-            # wind variable
-            self._i_wind_var = False
             # wind direction
             self._i_wind_dir = int(l_results[0][:3])
             # wind velocity (m/s)
@@ -527,8 +520,6 @@ class SMetar:
             # wind
             self._s_wind = l_results[0].strip()
 
-            # wind variable
-            self._i_wind_var = False
             # wind direction
             self._i_wind_dir = int(l_results[0][:3])
             # wind velocity (kt)
@@ -547,35 +538,17 @@ class SMetar:
                                                                                                self._i_gust_kt,
                                                                                                self._i_gust_mps)
 
-        # search for min/max (kt)
-        l_results = re.search(r"[0-9]{3}V[0-9]{3}", self._s_metar_data)
-
-        if l_results:
-            # wind variable
-            self._s_wind_var = l_results[0].strip()
-
-            # wind variable
-            self._i_wind_var = True
-            # wind direction min
-            self._i_wind_dir_min = int(l_results[0][:3])
-            # wind direction max
-            self._i_wind_dir_max = int(l_results[0][4:])
-
-            # logger
-            M_LOG.info("Variable winds direction between %d° and %d°.", self._i_wind_dir_min,
-                                                                        self._i_wind_dir_max)
-
         # search for variable (kt)
         l_results = re.search(r"VRB[0-9]{2}MPS", self._s_metar_data)
 
         if l_results:
             # wind variable
-            self._s_wind_var = l_results[0].strip()
+            self._s_wind = l_results[0].strip()
 
-            # wind variable
-            self._i_wind_var = True
+            # wind direction
+            self._i_wind_dir = None
             # wind velocity (m/s)
-            self._i_wind_vel_mps = int(l_results[0][3:-3])
+            self._i_wind_vel_mps = int(l_results[0][3:5])
             # wind velocity (kt)
             self._i_wind_vel_kt = int(round(self._i_wind_vel_mps * df.DF_MPS2KT, 0))
 
@@ -588,18 +561,34 @@ class SMetar:
 
         if l_results:
             # wind variable
-            self._s_wind_var = l_results[0].strip()
+            self._s_wind = l_results[0].strip()
 
-            # wind variable
-            self._i_wind_var = True
+            # wind direction
+            self._i_wind_dir = None
             # wind velocity (kt)
-            self._i_wind_vel_kt = int(l_results[0][3:-2])
+            self._i_wind_vel_kt = int(l_results[0][3:5])
             # wind velocity (m/s)
             self._i_wind_vel_mps = int(round(self._i_wind_vel_kt * df.DF_KT2MPS, 0))
 
             # logger
             M_LOG.info("Variable winds directions at %d knots (%d mps).", self._i_wind_vel_kt,
                                                                           self._i_wind_vel_mps)
+
+        # search for min/max (°)
+        l_results = re.search(r"[0-9]{3}V[0-9]{3}", self._s_metar_data)
+
+        if l_results:
+            # wind variable
+            self._s_wind_var = l_results[0].strip()
+
+            # wind direction min
+            self._i_wind_dir_min = int(l_results[0][:3])
+            # wind direction max
+            self._i_wind_dir_max = int(l_results[0][4:])
+
+            # logger
+            M_LOG.info("Variable winds direction between %d° and %d°.", self._i_wind_dir_min,
+                                                                        self._i_wind_dir_max)
 
     # ---------------------------------------------------------------------------------------------
     def cut_id(self):
@@ -691,12 +680,6 @@ class SMetar:
     def s_wind_var(self):
         """wind"""
         return self._s_wind_var
-
-    # ---------------------------------------------------------------------------------------------
-    @property
-    def v_wind_var(self):
-        """wind"""
-        return self._v_wind_var
 
     # ---------------------------------------------------------------------------------------------
     @property
