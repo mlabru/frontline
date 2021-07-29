@@ -12,8 +12,8 @@ import logging
 # < defines >--------------------------------------------------------------------------------------
 
 # logging level
-DI_LOG_LEVEL = logging.WARNING
-# DI_LOG_LEVEL = logging.INFO
+# DI_LOG_LEVEL = logging.WARNING
+DI_LOG_LEVEL = logging.DEBUG
 
 # GMT is ahead of us
 DI_DIFF_GMT = 3
@@ -30,6 +30,13 @@ DF_KT2MPS = 0.514444444
 
 # m/s -> kt
 DF_MPS2KT = 1.943844492
+
+
+# REDEMET API key
+DS_REDEMET_KEY = "w70wXiIZBBMVFhBFS6ApwrC9x24ZU7T7RsdIbZ9f"
+
+# REDEMET
+DS_REDEMET_URL = "https://api-redemet.decea.mil.br/mensagens/metar/{2}?api_key={0}&data_ini={1}&data_fim={1}"
 
 
 # frontlines directory

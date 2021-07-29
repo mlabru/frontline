@@ -10,6 +10,7 @@ fl_metsar_gen
 import logging
 import math
 import pathlib
+import shutil
 
 # local
 import fl_defs as df
@@ -218,15 +219,91 @@ def grp_wind(fdct_reg, fo_metaf):
     return "{}KT".format(ls_wind), li_wvel, li_wdir, li_wraj
 
 # -------------------------------------------------------------------------------------------------
-def make_metsar(fs_file, fs_icao_code, fdct_reg, ff_altitude, fo_metaf, f_bdc):
+def make_metsar_from_file(fs_file):
     """
-    generate METSAR file from ensemble
+    generate METSAR from carrapato file
+
+    :param fs_file (str): carrapato filename
+    """
+    # output filename
+    ls_out = fs_file.replace("carrapato", "frontline")
+
+    # save METSAR
+    shutil.copyfile(pathlib.PurePath(df.DS_TICKS_DIR).joinpath(fs_file),
+                    pathlib.PurePath(df.DS_OUT_DIR).joinpath(ls_out))
+
+# -------------------------------------------------------------------------------------------------
+def make_metsar_from_list(fs_file, fs_icao_code, fs_hour, flst_data, ff_altitude, fo_metaf, f_bdc):
+    """
+    generate METSAR from station data
 
     :param fs_file (str): carrapato filename
     :param fs_icao_code (str): aerodrome ICAO Code
-    :param fdct_reg (dict): register
-    :param ff_altitude (float): station altitude (m)
-    :param fo_metaf (SMETAR): METAR from model (METAF)
+    :param fs_hour (str): time (H)
+    :param flst_data (lst): station data register
+    :param ff_altitude (float): station altitude (ft)
+    :param fo_metaf (SMETAR): METAF from carrapato
+    :param f_bdc (conn): connection to BDC
+    """
+    # for all station data...
+    for ldct_reg in flst_data:
+        # right hour ?
+        if fs_hour == ldct_reg["HR_MEDICAO"].strip():
+            # output filename
+            ls_out = fs_file.replace("carrapato", "frontline")
+
+            # create output file
+            with open (pathlib.PurePath(df.DS_OUT_DIR).joinpath(ls_out), "w") as lfh_out:
+                # time
+                ls_time, ls_day, ls_hour = grp_time(fdct_reg)
+
+                # wind
+                ls_wind, li_wvel, li_wdir, li_wraj = grp_wind(fdct_reg, fo_metaf)
+
+                # visibility
+                ls_vis, li_vis = grp_vis(fo_metaf)
+
+                # temperature
+                ls_temp, li_tabs, li_tpo = grp_temp(fdct_reg, fo_metaf)
+
+                # pressure
+                ls_qnh, li_qnh = grp_qnh(fdct_reg, ff_altitude, fo_metaf)
+
+                # write output file
+                lfh_out.write("METSAR {} {} {} {} {} {}=".format(fs_icao_code,
+                                                                 ls_time,
+                                                                 ls_wind,
+                                                                 ls_vis,
+                                                                 ls_temp,
+                                                                 ls_qnh))
+
+                # write METSAR to BDC
+                sb.bdc_save_metsar(fs_icao_code,
+                                   ls_day, ls_hour,
+                                   li_tabs, li_tpo,
+                                   li_wvel, li_wdir, li_wraj,
+                                   li_vis,
+                                   li_qnh,
+                                   f_bdc)
+            # quit
+            break
+
+    # senão,...
+    else:
+        # gera METSAR from carrapato
+        make_metsar_from_file(fs_file)
+        # logger
+        M_LOG.error("station hour not found. METSAR from METAF (carrapato).")
+
+# -------------------------------------------------------------------------------------------------
+def make_metsar_from_metar(fs_file, fs_icao_code, fo_metar, fo_metaf, f_bdc):
+    """
+    generate METSAR from location METAR
+
+    :param fs_file (str): carrapato filename
+    :param fs_icao_code (str): aerodrome ICAO Code
+    :param fo_metar (SMETAR): location METAR
+    :param fo_metaf (SMETAR): METAF from carrapato
     :param f_bdc (conn): connection to BDC
     """
     # output filename
@@ -235,19 +312,28 @@ def make_metsar(fs_file, fs_icao_code, fdct_reg, ff_altitude, fo_metaf, f_bdc):
     # create output file
     with open (pathlib.PurePath(df.DS_OUT_DIR).joinpath(ls_out), "w") as lfh_out:
         # time
-        ls_time, ls_day, ls_hour = grp_time(fdct_reg)
+        ls_time = fo_metar.s_forecast_time
+        ls_day  = str(ls_time[:2])
+        ls_hour = str(ls_time[2:4] + ls_time[4:6])
 
         # wind
-        ls_wind, li_wvel, li_wdir, li_wraj = grp_wind(fdct_reg, fo_metaf)
+        ls_wind = fo_metaf.s_wind        if fo_metar.s_wind        is None else fo_metar.s_wind
+        li_wvel = fo_metaf.i_wind_vel_kt if fo_metar.i_wind_vel_kt is None else fo_metar.i_wind_vel_kt
+        li_wdir = fo_metaf.i_wind_dir    if fo_metar.i_wind_dir    is None else fo_metar.i_wind_dir
+        li_wraj = fo_metaf.i_gust_kt     if fo_metar.i_gust_kt     is None else fo_metar.i_gust_kt
 
         # visibility
-        ls_vis, li_vis = grp_vis(fo_metaf)
+        ls_vis = fo_metaf.s_visibility if fo_metar.s_visibility is None else fo_metar.s_visibility
+        li_vis = fo_metaf.i_visibility if fo_metar.i_visibility is None else fo_metar.i_visibility
 
         # temperature
-        ls_temp, li_tabs, li_tpo = grp_temp(fdct_reg, fo_metaf)
+        ls_temp = fo_metaf.s_temperature   if fo_metar.s_temperature   is None else fo_metar.s_temperature
+        li_tabs = fo_metaf.i_temperature_c if fo_metar.i_temperature_c is None else fo_metar.i_temperature_c
+        li_tpo  = fo_metaf.i_dewpoint_c    if fo_metar.i_dewpoint_c    is None else fo_metar.i_dewpoint_c
 
         # pressure
-        ls_qnh, li_qnh = grp_qnh(fdct_reg, ff_altitude, fo_metaf)
+        ls_qnh = fo_metaf.s_pressure     if fo_metar.s_pressure     is None else fo_metar.s_pressure
+        li_qnh = fo_metaf.i_pressure_hpa if fo_metar.i_pressure_hpa is None else fo_metar.i_pressure_hpa
 
         # write output file
         lfh_out.write("METSAR {} {} {} {} {} {}=".format(fs_icao_code,

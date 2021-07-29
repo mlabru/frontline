@@ -30,6 +30,9 @@ class SMetar:
         """
         constructor
         """
+        # logger
+        M_LOG.debug("fs_metar_data: %s", fs_metar_data)
+
         # metar data
         self._s_metar_data = fs_metar_data
 
@@ -62,6 +65,7 @@ class SMetar:
         self._s_icao_code = None
 
         # pressure
+        self._s_pressure = None
         self._i_pressure_hpa = None
         self._i_pressure_inhg = None
 
@@ -77,6 +81,7 @@ class SMetar:
         # temperature
         self._i_dewpoint_c = None
         self._i_dewpoint_f = None
+        self._s_temperature = None
         self._i_temperature_c = None
         self._i_temperature_f = None
 
@@ -86,6 +91,7 @@ class SMetar:
         self._v_tempo = None
 
         # visibility
+        self._s_visibility = None
         self._i_visibility = None
 
         # weather
@@ -95,6 +101,7 @@ class SMetar:
         # wind type
         self._i_gust_kt = None
         self._i_gust_mps = None
+        self._s_wind = None
         self._i_wind_dir = None
         self._i_wind_dir_max = None
         self._i_wind_dir_min = None
@@ -219,7 +226,10 @@ class SMetar:
         l_result = re.search(r"[Q][0-9]{4}", self._s_metar_data)
 
         if l_result:
-            # pressure_(hpa)
+            # pressure
+            self._s_pressure = l_result[0].strip()
+
+            # pressure (hpa)
             self._i_pressure_hpa = int(l_result[0][1:])
 
             # logger
@@ -229,6 +239,9 @@ class SMetar:
         l_result = re.search(r"[A][0-9]{4}", self._s_metar_data)
 
         if l_result:
+            # pressure
+            self._s_pressure = l_result[0].strip()
+
             # pressure_(inHg)
             self._i_pressure_inhg = float(l_result[0][1:-2] + "." + l_result[0][3:])
 
@@ -311,6 +324,9 @@ class SMetar:
         l_result = re.search(r"[0-9]{2}[/][0-9]{2}|M[0-9]{2}[/]M[0-9]{2}|[0-9]{2}[/]M[0-9]{2}", self._s_metar_data)
 
         if l_result:
+            # temperature
+            self._s_temperature = l_result[0].strip()
+
             # for a negative temperature in Celsius, replace M to -
             l_result = re.split(r"\/", l_result[0].replace('M', '-'))
 
@@ -374,10 +390,14 @@ class SMetar:
         l_result = re.search(r"\s[0-9]{4}\s|CAVOK", self._s_metar_data)
 
         if l_result:
+            # visibility
+            self._s_visibility = l_result[0].strip()
+
             # cavok ?
             if "CAVOK" == l_result[0]:
                 # cavok
                 self._v_cavok = True
+                
 
                 # logger
                 M_LOG.info("Visibility: Ceiling And Visibility OK.")
@@ -416,7 +436,7 @@ class SMetar:
 
         if l_result:
             # weather
-            self._s_weather = str(l_result[0])
+            self._s_weather = str(l_result[0]).strip()
 
             # for all messages...
             self._s_weather_text = df.DDCT_WEATHER.get(self._s_weather, None)
@@ -436,13 +456,16 @@ class SMetar:
         l_results = re.search(r"[0-9]{5}MPS", self._s_metar_data)
 
         if l_results:
+            # wind
+            self._s_wind = l_results[0].strip()
+
             # wind direction
             self._i_wind_dir = int(l_results[0][:3])
             # wind velocity (m/s)
             self._i_wind_vel_mps = int(l_results[0][3:-3])
             # wind velocity (kt)
             self._i_wind_vel_kt = int(round(self._i_wind_vel_mps * df.DF_MPS2KT, 0))
-
+            
             # logger
             M_LOG.info("Wind: Winds from %d° at %d mps (%d knots).", self._i_wind_dir,
                                                                      self._i_wind_vel_mps,
@@ -452,6 +475,9 @@ class SMetar:
         l_results = re.search(r"[0-9]{5}KT", self._s_metar_data)
 
         if l_results:
+            # wind
+            self._s_wind = l_results[0].strip()
+
             # wind direction
             self._i_wind_dir = int(l_results[0][:3])
             # wind velocity (kt)
@@ -468,6 +494,9 @@ class SMetar:
         l_results = re.search(r"[0-9]{5}G[0-9]{2}MPS", self._s_metar_data)
 
         if l_results:
+            # wind
+            self._s_wind = l_results[0].strip()
+
             # wind direction
             self._i_wind_dir = int(l_results[0][:3])
             # wind velocity (m/s)
@@ -490,6 +519,9 @@ class SMetar:
         l_results = re.search(r"[0-9]{5}G[0-9]{2}KT", self._s_metar_data)
 
         if l_results:
+            # wind
+            self._s_wind = l_results[0].strip()
+
             # wind direction
             self._i_wind_dir = int(l_results[0][:3])
             # wind velocity (kt)
@@ -512,6 +544,9 @@ class SMetar:
         l_results = re.search(r"[0-9]{3}V[0-9]{3}", self._s_metar_data)
 
         if l_results:
+            # wind
+            self._s_wind = l_results[0].strip()
+
             # wind direction min
             self._i_wind_dir_min = int(l_results[0][:3])
             # wind direction max
@@ -592,6 +627,12 @@ class SMetar:
 
     # ---------------------------------------------------------------------------------------------
     @property
+    def s_pressure(self):
+        """pressure"""
+        return self._s_pressure
+
+    # ---------------------------------------------------------------------------------------------
+    @property
     def i_pressure_hpa(self):
         """pressure in hPa"""
         return self._i_pressure_hpa
@@ -604,9 +645,27 @@ class SMetar:
 
     # ---------------------------------------------------------------------------------------------
     @property
+    def s_temperature(self):
+        """temperature"""
+        return self._s_temperature
+
+    # ---------------------------------------------------------------------------------------------
+    @property
     def i_visibility(self):
         """visibility in m"""
         return self._i_visibility
+
+    # ---------------------------------------------------------------------------------------------
+    @property
+    def s_visibility(self):
+        """visibility"""
+        return self._s_visibility
+
+    # ---------------------------------------------------------------------------------------------
+    @property
+    def s_wind(self):
+        """wind"""
+        return self._s_wind
 
     # ---------------------------------------------------------------------------------------------
     @property
@@ -621,7 +680,7 @@ class SMetar:
         return self._i_wind_vel_kt
 
 # -------------------------------------------------------------------------------------------------
-def _get_metar_data(fs_station_file):
+def _get_metar_mens(fs_station_file):
     """
     read a string from a file with a metar
     """
@@ -630,21 +689,21 @@ def _get_metar_data(fs_station_file):
         # load file
         ls_line = lfh_md.read()
 
-    # METAF or METAR data ?
-    if ls_line.startswith("METAF") or ls_line.startswith("METAR"):
-        # get metar data
-        ls_line = ls_line[5:]
-
     # return
-    return ls_line.strip()
+    return ls_line
 
 # -------------------------------------------------------------------------------------------------
-def metar_parse(fs_station_file):
+def metar_parse(fs_mens):
     """
     metar parse
     """
+    # METAF or METAR data ?
+    if fs_mens.startswith("METAF") or fs_mens.startswith("METAR"):
+        # get metar data
+        fs_mens = fs_mens[5:]
+
     # transfer a line with data to SMetar
-    lo_metar = SMetar(_get_metar_data(fs_station_file))
+    lo_metar = SMetar(fs_mens.strip())
     assert lo_metar
 
     # airport index
@@ -679,6 +738,18 @@ def metar_parse(fs_station_file):
 
     # notes
     lo_metar.remarks()
+
+    # return
+    return lo_metar
+
+# -------------------------------------------------------------------------------------------------
+def metar_parse_file(fs_station_file):
+    """
+    metar parse file
+    """
+    # transfer a line with data to SMetar
+    lo_metar = metar_parse(_get_metar_mens(fs_station_file))
+    assert lo_metar
 
     # return
     return lo_metar
