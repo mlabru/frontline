@@ -72,7 +72,7 @@ def bdc_save_metaf(fo_metaf, f_bdc):
     # make query
     ls_query = "insert into metaf(sigla_aerodromo, dt_metaf, hr_metaf, temperatura_ar, " \
                "temperatura_po, velocidade_vento, direcao_vento, rajada, visibilidade, " \
-               "qnh) values ('{}', '{}', '{}', {}, {}, {}, {}, {}, {}, {})".format(
+               "qnh) values ('{}', '{}', '{}', {}, {}, {}, {}, {}, {}, {}, '{}')".format(
                fo_metaf.s_icao_code,
                ldt_date,
                ldt_time,
@@ -82,7 +82,8 @@ def bdc_save_metaf(fo_metaf, f_bdc):
                fo_metaf.i_wind_dir if fo_metaf.i_wind_dir is not None else "null",
                fo_metaf.i_gust_kt if fo_metaf.i_gust_kt is not None else "null",
                li_vis,
-               fo_metaf.i_pressure_hpa if fo_metaf.i_pressure_hpa is not None else "null"
+               fo_metaf.i_pressure_hpa if fo_metaf.i_pressure_hpa is not None else "null",
+               "METAF " + fo_metaf.s_metar_mesg
                )
 
     # write to BDC
@@ -119,7 +120,7 @@ def bdc_save_metar(fo_metar, f_bdc):
     # make query
     ls_query = "insert into metar(sigla_aerodromo, dt_metar, hr_metar, temperatura_ar, " \
                "temperatura_po, velocidade_vento, direcao_vento, rajada, visibilidade, " \
-               "qnh) values ('{}', '{}', '{}', {}, {}, {}, {}, {}, {}, {})".format(
+               "qnh) values ('{}', '{}', '{}', {}, {}, {}, {}, {}, {}, {}, '{}')".format(
                fo_metar.s_icao_code,
                ldt_date,
                ldt_time,
@@ -129,7 +130,8 @@ def bdc_save_metar(fo_metar, f_bdc):
                fo_metar.i_wind_dir if fo_metar.i_wind_dir is not None else "null",
                fo_metar.i_gust_kt if fo_metar.i_gust_kt is not None else "null",
                li_vis,
-               fo_metar.i_pressure_hpa if fo_metar.i_pressure_hpa is not None else "null"
+               fo_metar.i_pressure_hpa if fo_metar.i_pressure_hpa is not None else "null",
+               "METAR " + fo_metar.s_metar_mesg
                )
 
     # write to BDC
@@ -138,7 +140,7 @@ def bdc_save_metar(fo_metar, f_bdc):
 
 # -------------------------------------------------------------------------------------------------
 def bdc_save_metsar(fs_icao_code, fs_day, fs_time, fi_tabs, fi_tpo,
-                    fi_wvel, fi_wdir, fi_wraj, fi_vis, fi_qnh, f_bdc):
+                    fi_wvel, fi_wdir, fi_wraj, fi_vis, fi_qnh, fs_mesg, f_bdc):
     """
     write metsar data to BDC
     """
@@ -152,7 +154,7 @@ def bdc_save_metsar(fs_icao_code, fs_day, fs_time, fi_tabs, fi_tpo,
     # make query
     ls_query = "insert into metsar(sigla_aerodromo, dt_metsar, hr_metsar, temperatura_ar, " \
                "temperatura_po, velocidade_vento, direcao_vento, rajada, visibilidade, " \
-               "qnh) values ('{}', '{}', '{}', {}, {}, {}, {}, {}, {}, {})".format(
+               "qnh) values ('{}', '{}', '{}', {}, {}, {}, {}, {}, {}, {}, '{}')".format(
                fs_icao_code,
                ldt_date, ldt_time,
                fi_tabs if fi_tabs is not None else "null",
@@ -161,7 +163,8 @@ def bdc_save_metsar(fs_icao_code, fs_day, fs_time, fi_tabs, fi_tpo,
                fi_wdir if fi_wdir is not None else "null",
                fi_wraj if fi_wraj is not None else "null",
                fi_vis if fi_vis is not None else "null",
-               fi_qnh if fi_qnh is not None else "null"
+               fi_qnh if fi_qnh is not None else "null",
+               fs_mesg
                )
 
     # write to BDC

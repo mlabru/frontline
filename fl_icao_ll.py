@@ -119,7 +119,7 @@ def find_near_station(fs_icao_code):
             lf_altitude = lval[2]
 
     # logger
-    M_LOG.info("near station of %s is %s @ dist: %6.2f (m) alt: %6.2f (m)", str(fs_icao_code), str(ls_station), lf_dist, lf_altitude)
+    M_LOG.info("near station of %s is %s @ dst: %6.2f(m) alt: %6.2f(m)", fs_icao_code, ls_station, lf_dist, lf_altitude)
 
     # return nearest station
     return ls_station, lf_altitude

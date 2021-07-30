@@ -65,10 +65,7 @@ def redemet_get_location(fs_date, fs_location):
 
                         if ls_mens:
                             # parse METAR
-                            lo_metar = mp.metar_parse(ls_mens.strip())
-
-                            # return metar
-                            return lo_metar
+                            return mp.metar_parse(ls_mens.strip())
 
     # return error
     return None

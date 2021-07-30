@@ -26,15 +26,15 @@ class SMetar:
     string parsing of weather station
     """
     # ---------------------------------------------------------------------------------------------
-    def __init__(self, fs_metar_data):
+    def __init__(self, fs_metar_mesg):
         """
         constructor
         """
         # logger
-        M_LOG.debug("fs_metar_data: %s", fs_metar_data)
+        M_LOG.debug("fs_metar_mesg: %s", fs_metar_mesg)
 
         # metar data
-        self._s_metar_data = fs_metar_data
+        self._s_metar_mesg = fs_metar_mesg
 
         # cloudiness
         self._v_cavok = None
@@ -109,14 +109,47 @@ class SMetar:
         self._i_wind_vel_kt = None
         self._i_wind_vel_mps = None
 
+        # airport index
+        self._icao_code()
+
+        # type of formation
+        self._report_type()
+
+        # report formation
+        self._forecast_time()
+
+        # speed and wind direction
+        self._wind_type()
+
+        # visibility conditions
+        self._visibility()
+
+        # cloudy
+        self._clouds_type()
+
+        # temperature
+        self._temperature()
+
+        # pressure
+        self._pressure()
+
+        # weather
+        self._weather_type()
+
+        # forecasts
+        self._trends()
+
+        # notes
+        self._remarks()
+
     # ---------------------------------------------------------------------------------------------
-    def clouds_type(self):
+    def _clouds_type(self):
         """
         determining the type of cloudiness
         """
         # search for type of cloudiness
         l_result = re.findall(r"SKC[0-9]{3}|NSC[0-9]{3}|FEW[0-9]{3}|SCT[0-9]{3}"
-                              "|BKN[0-9]{3}|OVC[0-9]{3}|VV[0-9]{3}", self._s_metar_data)
+                              "|BKN[0-9]{3}|OVC[0-9]{3}|VV[0-9]{3}", self._s_metar_mesg)
 
         for ls_type_cloud in l_result:
             # skc ?
@@ -188,13 +221,13 @@ class SMetar:
                 M_LOG.info("Clouds: Clouds cannot be seen because of fog or heavy precipitation.")
 
     # ---------------------------------------------------------------------------------------------
-    def forecast_time(self):
+    def _forecast_time(self):
         """
         search for the reporting time
         """
 
         # search for forecast time
-        l_result = re.search(r"[0-9]{6}[Z]", self._s_metar_data)
+        l_result = re.search(r"[0-9]{6}[Z]", self._s_metar_mesg)
 
         # forecast time
         self._s_forecast_time = str(l_result[0])
@@ -203,12 +236,12 @@ class SMetar:
         M_LOG.info("Time issued: %s %s:%s.", l_result[0][:2], l_result[0][2:4], l_result[0][4:6])
 
     # ---------------------------------------------------------------------------------------------
-    def icao_code(self):
+    def _icao_code(self):
         """
         ICAO Airport Index Search Method
         """
         # search for icao code
-        l_result = re.search(r"[A-Z]{4}", self._s_metar_data)
+        l_result = re.search(r"[A-Z]{4}", self._s_metar_mesg)
 
         # icao code
         self._s_icao_code = str(l_result[0])
@@ -217,12 +250,12 @@ class SMetar:
         M_LOG.info("Identifier: %s.", self._s_icao_code)
 
     # ---------------------------------------------------------------------------------------------
-    def pressure(self):
+    def _pressure(self):
         """
         pressure search method
         """
         # search for QNH (hPa)
-        l_result = re.search(r"[Q][0-9]{4}", self._s_metar_data)
+        l_result = re.search(r"[Q][0-9]{4}", self._s_metar_mesg)
 
         if l_result:
             # pressure
@@ -235,7 +268,7 @@ class SMetar:
             M_LOG.info("Pressure: QNH %d hPa.", self._i_pressure_hpa)
 
         # search for QNH (inHg)
-        l_result = re.search(r"[A][0-9]{4}", self._s_metar_data)
+        l_result = re.search(r"[A][0-9]{4}", self._s_metar_mesg)
 
         if l_result:
             # pressure
@@ -248,12 +281,12 @@ class SMetar:
             M_LOG.info("Pressure: Sea level pressure is %d inHg.", self._i_pressure_inhg)
 
     # ---------------------------------------------------------------------------------------------
-    def remarks(self):
+    def _remarks(self):
         """
         notes
         """
         # search for notes
-        l_result = re.search(r"AO2", self._s_metar_data)
+        l_result = re.search(r"AO2", self._s_metar_mesg)
 
         if l_result:
             # a02
@@ -263,7 +296,7 @@ class SMetar:
             M_LOG.info("This station is automated with a precipitation discriminator (rain/snow) sensor.")
 
         # search for notes
-        l_result = re.search(r"PWINO", self._s_metar_data)
+        l_result = re.search(r"PWINO", self._s_metar_mesg)
 
         if l_result:
             # pwino
@@ -273,7 +306,7 @@ class SMetar:
             M_LOG.info("Precipitation identifier sensor not available.")
 
         # search for notes
-        l_result = re.search(r"\$", self._s_metar_data)
+        l_result = re.search(r"\$", self._s_metar_mesg)
 
         if l_result:
             # maint
@@ -283,7 +316,7 @@ class SMetar:
             M_LOG.info("System needs maintance.")
 
     # ---------------------------------------------------------------------------------------------
-    def report_type(self):
+    def _report_type(self):
         """
         determining the type of report
 
@@ -291,7 +324,7 @@ class SMetar:
         - COR  - if it is a correction
         """
         # search for report type
-        l_result = re.search(r"COR", self._s_metar_data)
+        l_result = re.search(r"COR", self._s_metar_mesg)
 
         if l_result:
             # correction ?
@@ -303,7 +336,7 @@ class SMetar:
                 M_LOG.info("Report type: This is a correction report")
 
         # search for report type
-        l_result = re.search(r"AUTO", self._s_metar_data)
+        l_result = re.search(r"AUTO", self._s_metar_mesg)
 
         if l_result:
             # auto ?
@@ -315,12 +348,12 @@ class SMetar:
                 M_LOG.info("Report type: This is a fully automated report")
 
     # ---------------------------------------------------------------------------------------------
-    def temperature(self):
+    def _temperature(self):
         """
         find the temperature and dewpoints
         """
         # search for temperature
-        l_result = re.search(r"[0-9]{2}[/][0-9]{2}|M[0-9]{2}[/]M[0-9]{2}|[0-9]{2}[/]M[0-9]{2}", self._s_metar_data)
+        l_result = re.search(r"[0-9]{2}[/][0-9]{2}|M[0-9]{2}[/]M[0-9]{2}|[0-9]{2}[/]M[0-9]{2}", self._s_metar_mesg)
 
         if l_result:
             # temperature
@@ -348,12 +381,12 @@ class SMetar:
                                                                         self._i_dewpoint_f)
 
     # ---------------------------------------------------------------------------------------------
-    def trends(self):
+    def _trends(self):
         """
         forecasting changes
         """
         # search for forecasting changes
-        l_result = re.search(r"NOSIG|BECMG|TEMPO", self._s_metar_data)
+        l_result = re.search(r"NOSIG|BECMG|TEMPO", self._s_metar_mesg)
 
         if l_result:
             # nosig ?
@@ -381,12 +414,12 @@ class SMetar:
                 M_LOG.info("Trends: Temporary significant changes in weather conditions are expected.")
 
     # ---------------------------------------------------------------------------------------------
-    def visibility(self):
+    def _visibility(self):
         """
         determining visibility conditions
         """
         # search for visibility
-        l_result = re.search(r"\s[0-9]{4}\s|CAVOK", self._s_metar_data)
+        l_result = re.search(r"\s[0-9]{4}\s|CAVOK", self._s_metar_mesg)
 
         if l_result:
             # visibility
@@ -419,7 +452,7 @@ class SMetar:
                     M_LOG.info("Visibility: %d meter.", self._i_visibility)
 
     # ---------------------------------------------------------------------------------------------
-    def weather_type(self):
+    def _weather_type(self):
         """
         weather type determination
         """
@@ -430,7 +463,7 @@ class SMetar:
                                 |[\-\+]RASN|RASN|[\-\+]SNRA|SNRA|[\-\+]SHSN|SHSN|[\-\+]SHRA|SHRA
                                 |[\-\+]SHGR|SHGR|[\-\+]TSGR|TSGR|[\-\+]FZRA|FZRA|[\-\+]FZDZ|FZDZ
                                 |[\-\+]TSRA|TSRA|[\-\+]SHGR|SHGR|[\-\+]TSGS|TSGS|[\-\+]TSSN|TSSN
-                                """, self._s_metar_data)
+                                """, self._s_metar_mesg)
 
         if l_result:
             # weather
@@ -440,18 +473,16 @@ class SMetar:
             self._s_weather_text = df.DDCT_WEATHER.get(self._s_weather, None)
 
             if self._s_weather_text:
-                pass
-
                 # logger
                 M_LOG.info("Weather: %s.", str(self._s_weather_text))
 
     # ---------------------------------------------------------------------------------------------
-    def wind_type(self):
+    def _wind_type(self):
         """
         determination of speed and wind guide
         """
         # search for velocity (mps)
-        l_results = re.search(r"[0-9]{5}MPS", self._s_metar_data)
+        l_results = re.search(r"[0-9]{5}MPS", self._s_metar_mesg)
 
         if l_results:
             # wind
@@ -470,7 +501,7 @@ class SMetar:
                                                                      self._i_wind_vel_kt)
 
         # search for velocity (kt)
-        l_results = re.search(r"[0-9]{5}KT", self._s_metar_data)
+        l_results = re.search(r"[0-9]{5}KT", self._s_metar_mesg)
 
         if l_results:
             # wind
@@ -489,7 +520,7 @@ class SMetar:
                                                                      self._i_wind_vel_mps)
 
         # search for gust (mps)
-        l_results = re.search(r"[0-9]{5}G[0-9]{2}MPS", self._s_metar_data)
+        l_results = re.search(r"[0-9]{5}G[0-9]{2}MPS", self._s_metar_mesg)
 
         if l_results:
             # wind
@@ -514,7 +545,7 @@ class SMetar:
                                                                                              self._i_gust_kt)
 
         # search for gust (kt)
-        l_results = re.search(r"[0-9]{5}G[0-9]{2}KT", self._s_metar_data)
+        l_results = re.search(r"[0-9]{5}G[0-9]{2}KT", self._s_metar_mesg)
 
         if l_results:
             # wind
@@ -538,8 +569,8 @@ class SMetar:
                                                                                                self._i_gust_kt,
                                                                                                self._i_gust_mps)
 
-        # search for variable (kt)
-        l_results = re.search(r"VRB[0-9]{2}MPS", self._s_metar_data)
+        # search for variable (mps)
+        l_results = re.search(r"VRB[0-9]{2}MPS", self._s_metar_mesg)
 
         if l_results:
             # wind variable
@@ -557,7 +588,7 @@ class SMetar:
                                                                           self._i_wind_vel_kt)
 
         # search for variable (kt)
-        l_results = re.search(r"VRB[0-9]{2}KT", self._s_metar_data)
+        l_results = re.search(r"VRB[0-9]{2}KT", self._s_metar_mesg)
 
         if l_results:
             # wind variable
@@ -575,7 +606,7 @@ class SMetar:
                                                                           self._i_wind_vel_mps)
 
         # search for min/max (°)
-        l_results = re.search(r"[0-9]{3}V[0-9]{3}", self._s_metar_data)
+        l_results = re.search(r"[0-9]{3}V[0-9]{3}", self._s_metar_mesg)
 
         if l_results:
             # wind variable
@@ -591,13 +622,13 @@ class SMetar:
                                                                         self._i_wind_dir_max)
 
     # ---------------------------------------------------------------------------------------------
-    def cut_id(self):
+    def _cut_id(self):
         """
         cut off the message id
         """
-        self._s_metar_data = self._s_metar_data.split(' ')[1:]
-        self._s_metar_data = str.join(',', self._s_metar_data)
-        self._s_metar_data = self._s_metar_data.replace(',', ' ')
+        self._s_metar_mesg = self._s_metar_mesg.split(' ')[1:]
+        self._s_metar_mesg = str.join(',', self._s_metar_mesg)
+        self._s_metar_mesg = self._s_metar_mesg.replace(',', ' ')
 
     # =============================================================================================
     # data
@@ -632,6 +663,12 @@ class SMetar:
     def s_icao_code(self):
         """icao code"""
         return self._s_icao_code
+
+    # ---------------------------------------------------------------------------------------------
+    @property
+    def s_metar_mesg(self):
+        """metar string message"""
+        return self._s_metar_mesg
 
     # ---------------------------------------------------------------------------------------------
     @property
@@ -694,7 +731,7 @@ class SMetar:
         return self._i_wind_vel_kt
 
 # -------------------------------------------------------------------------------------------------
-def _get_metar_mens(fs_station_file):
+def _get_metar_mesg(fs_station_file):
     """
     read a string from a file with a metar
     """
@@ -716,56 +753,15 @@ def metar_parse(fs_mens):
         # get metar data
         fs_mens = fs_mens[5:]
 
-    # transfer a line with data to SMetar
-    lo_metar = SMetar(fs_mens.strip())
-    assert lo_metar
-
-    # airport index
-    lo_metar.icao_code()
-
-    # type of formation
-    lo_metar.report_type()
-
-    # report formation
-    lo_metar.forecast_time()
-
-    # speed and wind direction
-    lo_metar.wind_type()
-
-    # visibility conditions
-    lo_metar.visibility()
-
-    # cloudy
-    lo_metar.clouds_type()
-
-    # temperature
-    lo_metar.temperature()
-
-    # pressure
-    lo_metar.pressure()
-
-    # weather
-    lo_metar.weather_type()
-
-    # forecasts
-    lo_metar.trends()
-
-    # notes
-    lo_metar.remarks()
-
     # return
-    return lo_metar
+    return SMetar(fs_mens.strip())
 
 # -------------------------------------------------------------------------------------------------
 def metar_parse_file(fs_station_file):
     """
     metar parse file
     """
-    # transfer a line with data to SMetar
-    lo_metar = metar_parse(_get_metar_mens(fs_station_file))
-    assert lo_metar
-
     # return
-    return lo_metar
+    return metar_parse(_get_metar_mesg(fs_station_file))
 
 # < the end >--------------------------------------------------------------------------------------

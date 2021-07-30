@@ -307,13 +307,11 @@ def make_metsar_from_list(fs_file, fs_icao_code, fs_hour, flst_data, ff_altitude
                 # pressure
                 ls_qnh, li_qnh = grp_qnh(ldct_reg, ff_altitude, fo_metaf)
 
+                # build message
+                ls_mesg = "METSAR {} {} {} {} {} {}=".format(fs_icao_code, ls_time, ls_wind, ls_vis, ls_temp, ls_qnh)
+
                 # write output file
-                lfh_out.write("METSAR {} {} {} {} {} {}=".format(fs_icao_code,
-                                                                 ls_time,
-                                                                 ls_wind,
-                                                                 ls_vis,
-                                                                 ls_temp,
-                                                                 ls_qnh))
+                lfh_out.write(ls_mesg)
 
                 # write METSAR to BDC
                 sb.bdc_save_metsar(fs_icao_code,
@@ -322,6 +320,7 @@ def make_metsar_from_list(fs_file, fs_icao_code, fs_hour, flst_data, ff_altitude
                                    li_wvel, li_wdir, li_wraj,
                                    li_vis,
                                    li_qnh,
+                                   ls_mesg,
                                    f_bdc)
             # quit
             break
@@ -368,7 +367,7 @@ def make_metsar_from_metar(fs_file, fs_icao_code, fo_metar, fo_metaf, f_bdc):
         else:
             # direção do METAR
             li_wdir = fo_metar.i_wind_dir
- 
+
         # rajada
         li_wraj = fo_metaf.i_gust_kt if fo_metar.i_gust_kt is None else fo_metar.i_gust_kt
 
@@ -388,13 +387,11 @@ def make_metsar_from_metar(fs_file, fs_icao_code, fo_metar, fo_metaf, f_bdc):
         ls_qnh = fo_metaf.s_pressure     if fo_metar.s_pressure     is None else fo_metar.s_pressure
         li_qnh = fo_metaf.i_pressure_hpa if fo_metar.i_pressure_hpa is None else fo_metar.i_pressure_hpa
 
+        # build message
+        ls_mesg = "METSAR {} {} {} {} {} {}=".format(fs_icao_code, ls_time, ls_wind, ls_vis, ls_temp, ls_qnh)
+
         # write output file
-        lfh_out.write("METSAR {} {} {} {} {} {}=".format(fs_icao_code,
-                                                         ls_time,
-                                                         ls_wind,
-                                                         ls_vis,
-                                                         ls_temp,
-                                                         ls_qnh))
+        lfh_out.write(ls_mesg)
 
         # write METSAR to BDC
         sb.bdc_save_metsar(fs_icao_code,
@@ -403,6 +400,7 @@ def make_metsar_from_metar(fs_file, fs_icao_code, fo_metar, fo_metaf, f_bdc):
                            li_wvel, li_wdir, li_wraj,
                            li_vis,
                            li_qnh,
+                           ls_mesg,
                            f_bdc)
 
 # < the end >--------------------------------------------------------------------------------------

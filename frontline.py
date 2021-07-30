@@ -58,7 +58,7 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
 
     # try to get data from REDEMET
     lo_metar = rm.redemet_get_location(ls_date, ls_icao_code)
-    M_LOG.debug("REDEMET lo_metar: %s", str(lo_metar))
+    # M_LOG.debug("REDEMET lo_metar: %s", str(lo_metar))
 
     if lo_metar:
         # save to BDC
@@ -88,7 +88,7 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
 
         # try to get data from INMET
         llst_data = im.inmet_get_location(ls_dia, ls_station)
-        M_LOG.debug("INMET llst_data: %s", str(llst_data))
+        # M_LOG.debug("INMET llst_data: %s", str(llst_data))
 
         if llst_data:
             # make METSAR from station data
