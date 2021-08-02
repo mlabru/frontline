@@ -271,20 +271,20 @@ def make_metsar_from_file(fs_file):
                     pathlib.PurePath(df.DS_OUT_DIR).joinpath(ls_out))
 
 # -------------------------------------------------------------------------------------------------
-def make_metsar_from_list(fs_file, fs_icao_code, fs_hour, flst_data, ff_altitude, fo_metaf, f_bdc):
+def make_metsar_from_station_data(fs_file, fs_icao_code, fs_hour, flst_station_data, ff_altitude, fo_metaf, f_bdc):
     """
     generate METSAR from station data
 
     :param fs_file (str): carrapato filename
     :param fs_icao_code (str): aerodrome ICAO Code
     :param fs_hour (str): time (H)
-    :param flst_data (lst): station data register
+    :param flst_station_data (lst): station data register
     :param ff_altitude (float): station altitude (ft)
     :param fo_metaf (SMETAR): METAF from carrapato
     :param f_bdc (conn): connection to BDC
     """
     # for all station data...
-    for ldct_reg in flst_data:
+    for ldct_reg in flst_station_data:
         # right hour ?
         if fs_hour == ldct_reg["HR_MEDICAO"].strip():
             # output filename
@@ -374,10 +374,27 @@ def make_metsar_from_metar(fs_file, fs_icao_code, fo_metar, fo_metaf, f_bdc):
         # wind var
         ls_wind += "" if fo_metar.s_wind_var is None else " " + fo_metar.s_wind_var
 
-        # visibility
-        ls_vis = fo_metaf.s_visibility if fo_metar.s_visibility is None else fo_metar.s_visibility
-        li_vis = fo_metaf.i_visibility if fo_metar.i_visibility is None else fo_metar.i_visibility
+        # METAR have visibility or cavok ?
+        if fo_metar.i_visibility or fo_metar.v_cavok:
+            # visibility
+            ls_vis = fo_metar.s_visibility
+            # visibility
+            li_vis = fo_metar.i_visibility if fo_metar.i_visibility is not None else 99999
 
+        # senão, try METAF
+        elif fo_metaf.i_visibility or fo_metaf.v_cavok:
+            # visibility
+            ls_vis = fo_metaf.s_visibility
+            # visibility
+            li_vis = fo_metaf.i_visibility if fo_metaf.i_visibility is not None else 99999
+
+        # senão,...
+        else:
+            # visibility
+            ls_vis = ""
+            # visibility
+            li_vis = -99999
+            
         # temperature
         ls_temp = fo_metaf.s_temperature   if fo_metar.s_temperature   is None else fo_metar.s_temperature
         li_tabs = fo_metaf.i_temperature_c if fo_metar.i_temperature_c is None else fo_metar.i_temperature_c

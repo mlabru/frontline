@@ -87,12 +87,12 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
             return
 
         # try to get data from INMET
-        llst_data = im.inmet_get_location(ls_dia, ls_station)
-        # M_LOG.debug("INMET llst_data: %s", str(llst_data))
+        llst_station_data = im.inmet_get_location(ls_dia, ls_station)
+        # M_LOG.debug("INMET llst_station_data: %s", str(llst_station_data))
 
-        if llst_data:
+        if llst_station_data:
             # make METSAR from station data
-            mg.make_metsar_from_list(ls_file, ls_icao_code, ls_hour, llst_data, lf_altitude, lo_metaf, f_bdc)
+            mg.make_metsar_from_station_data(ls_file, ls_icao_code, ls_hour, llst_station_data, lf_altitude, lo_metaf, f_bdc)
 
         # senão,...
         else:
