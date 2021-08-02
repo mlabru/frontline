@@ -133,7 +133,7 @@ def parse_date(fs_data):
 
     # return date in datetime format
     return ldt_date
-
+'''
 # -------------------------------------------------------------------------------------------------
 def trata_carrapato(fdt_gmt, fs_file, f_bdc):
     """
@@ -207,7 +207,7 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
 
             # logger
             M_LOG.error("station data not found. METSAR from METAF (carrapato).")
-
+'''
 # -------------------------------------------------------------------------------------------------
 def main():
     """
@@ -222,7 +222,6 @@ def main():
 
     # station
     ls_station = "????" if "x" == l_args.code else str(l_args.code)
-    M_LOG.debug("ls_station: %s", ls_station)
 
     # time delta
     ldt_1hour = datetime.timedelta(hours=1)
@@ -235,7 +234,8 @@ def main():
     for li_i in range(li_delta):
         # format full date
         ls_date = ldt_ini.strftime("%Y%m%d%H")
-        M_LOG.debug("ls_date: %s", ls_date)
+        # logger
+        M_LOG.warning("Processando, estação: %s data: %s", ls_station, ls_date)
 
         # find all stations in directory...
         for ls_file in glob.glob("{}/saida_carrapato_{}_{}.txt".format(df.DS_TICKS_DIR, ls_station, ls_date)):
