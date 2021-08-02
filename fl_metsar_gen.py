@@ -169,7 +169,7 @@ def grp_vis(fo_metaf):
     ls_vis = ""
 
     # visibility
-    li_vis = -99999
+    li_vis = None
 
     # have visibility ?
     if fo_metaf.i_visibility is None:
@@ -356,7 +356,6 @@ def make_metsar_from_metar(fs_file, fs_icao_code, fo_metar, fo_metaf, f_bdc):
         # wind
         ls_wind = fo_metaf.s_wind        if fo_metar.s_wind        is None else fo_metar.s_wind
         li_wvel = fo_metaf.i_wind_vel_kt if fo_metar.i_wind_vel_kt is None else fo_metar.i_wind_vel_kt
-        # li_wdir = fo_metaf.i_wind_dir    if fo_metar.i_wind_dir    is None else fo_metar.i_wind_dir
 
         # vento sem direção ?
         if fo_metar.i_wind_dir is None:
@@ -393,7 +392,7 @@ def make_metsar_from_metar(fs_file, fs_icao_code, fo_metar, fo_metaf, f_bdc):
             # visibility
             ls_vis = ""
             # visibility
-            li_vis = -99999
+            li_vis = None
             
         # temperature
         ls_temp = fo_metaf.s_temperature   if fo_metar.s_temperature   is None else fo_metar.s_temperature
