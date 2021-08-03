@@ -154,9 +154,7 @@ def grp_time(fdct_reg):
     """
     # return group time
     return "{}{}Z".format(fdct_reg["DT_MEDICAO"][-2:],
-                          fdct_reg["HR_MEDICAO"]), \
-           fdct_reg["DT_MEDICAO"][-2:], \
-           fdct_reg["HR_MEDICAO"]
+                          fdct_reg["HR_MEDICAO"])
 
 # -------------------------------------------------------------------------------------------------
 def grp_vis(fo_metaf):
@@ -271,29 +269,32 @@ def make_metsar_from_file(fs_file):
                     pathlib.PurePath(df.DS_OUT_DIR).joinpath(ls_out))
 
 # -------------------------------------------------------------------------------------------------
-def make_metsar_from_station_data(fs_file, fs_icao_code, fs_hour, flst_station_data, ff_altitude, fo_metaf, f_bdc):
+def make_metsar_from_station_data(fdt_gmt, fs_file, fs_icao_code, flst_station_data, ff_altitude, fo_metaf, f_bdc):
     """
     generate METSAR from station data
 
+    :param fdt_gmt (datetime): processing date
     :param fs_file (str): carrapato filename
     :param fs_icao_code (str): aerodrome ICAO Code
-    :param fs_hour (str): time (H)
     :param flst_station_data (lst): station data register
     :param ff_altitude (float): station altitude (ft)
     :param fo_metaf (SMETAR): METAF from carrapato
     :param f_bdc (conn): connection to BDC
     """
+    # format hour
+    ls_hour = fdt_gmt.strftime("%H") + "00"
+
     # for all station data...
     for ldct_reg in flst_station_data:
         # right hour ?
-        if fs_hour == ldct_reg["HR_MEDICAO"].strip():
+        if ls_hour == ldct_reg["HR_MEDICAO"].strip():
             # output filename
             ls_out = fs_file.replace("carrapato", "frontline")
 
             # create output file
             with open (pathlib.PurePath(df.DS_OUT_DIR).joinpath(ls_out), "w") as lfh_out:
                 # time
-                ls_time, ls_day, ls_hour = grp_time(ldct_reg)
+                ls_time = grp_time(ldct_reg)
 
                 # wind
                 ls_wind, li_wvel, li_wdir, li_wraj = grp_wind(ldct_reg, fo_metaf)
@@ -314,8 +315,8 @@ def make_metsar_from_station_data(fs_file, fs_icao_code, fs_hour, flst_station_d
                 lfh_out.write(ls_mesg)
 
                 # write METSAR to BDC
-                sb.bdc_save_metsar(fs_icao_code,
-                                   ls_day, ls_hour,
+                sb.bdc_save_metsar(fdt_gmt,
+                                   fs_icao_code,
                                    li_tabs, li_tpo,
                                    li_wvel, li_wdir, li_wraj,
                                    li_vis,
@@ -333,10 +334,11 @@ def make_metsar_from_station_data(fs_file, fs_icao_code, fs_hour, flst_station_d
         M_LOG.error("station hour not found. METSAR from METAF (carrapato).")
 
 # -------------------------------------------------------------------------------------------------
-def make_metsar_from_metar(fs_file, fs_icao_code, fo_metar, fo_metaf, f_bdc):
+def make_metsar_from_metar(fdt_gmt, fs_file, fs_icao_code, fo_metar, fo_metaf, f_bdc):
     """
     generate METSAR from location METAR
 
+    :param fdt_gmt (datetime): processing date
     :param fs_file (str): carrapato filename
     :param fs_icao_code (str): aerodrome ICAO Code
     :param fo_metar (SMETAR): location METAR
@@ -350,8 +352,6 @@ def make_metsar_from_metar(fs_file, fs_icao_code, fo_metar, fo_metaf, f_bdc):
     with open (pathlib.PurePath(df.DS_OUT_DIR).joinpath(ls_out), "w") as lfh_out:
         # time
         ls_time = fo_metar.s_forecast_time
-        ls_day  = str(ls_time[:2])
-        ls_hour = str(ls_time[2:4] + ls_time[4:6])
 
         # wind
         ls_wind = fo_metaf.s_wind        if fo_metar.s_wind        is None else fo_metar.s_wind
@@ -410,8 +410,8 @@ def make_metsar_from_metar(fs_file, fs_icao_code, fo_metar, fo_metaf, f_bdc):
         lfh_out.write(ls_mesg)
 
         # write METSAR to BDC
-        sb.bdc_save_metsar(fs_icao_code,
-                           ls_day, ls_hour,
+        sb.bdc_save_metsar(fdt_gmt,
+                           fs_icao_code,
                            li_tabs, li_tpo,
                            li_wvel, li_wdir, li_wraj,
                            li_vis,

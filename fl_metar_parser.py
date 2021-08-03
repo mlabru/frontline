@@ -29,6 +29,8 @@ class SMetar:
     def __init__(self, fs_metar_mesg):
         """
         constructor
+
+        :param fs_metar_mesg (str): METAR message
         """
         # logger
         M_LOG.debug("fs_metar_mesg: %s", fs_metar_mesg)
@@ -734,6 +736,8 @@ class SMetar:
 def _get_metar_mesg(fs_station_file):
     """
     read a string from a file with a metar
+
+    :param fs_station_file (str): station file
     """
     # open carrapato for read metaf data
     with open(fs_station_file, "r") as lfh_md:
@@ -744,17 +748,19 @@ def _get_metar_mesg(fs_station_file):
     return ls_line
 
 # -------------------------------------------------------------------------------------------------
-def metar_parse(fs_mens):
+def metar_parse(fs_metar_mesg):
     """
     metar parse
+
+    :param fs_metar_mesg (str): METAR message
     """
     # METAF or METAR data ?
-    if fs_mens.startswith("METAF") or fs_mens.startswith("METAR"):
+    if fs_metar_mesg.startswith("METAF") or fs_metar_mesg.startswith("METAR"):
         # get metar data
-        fs_mens = fs_mens[5:]
+        fs_metar_mesg = fs_metar_mesg[5:]
 
     # return
-    return SMetar(fs_mens.strip())
+    return SMetar(fs_metar_mesg.strip())
 
 # -------------------------------------------------------------------------------------------------
 def metar_parse_file(fs_station_file):

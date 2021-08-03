@@ -33,6 +33,11 @@ M_LOG.setLevel(df.DI_LOG_LEVEL)
 def redemet_get_location(fs_date, fs_location):
     """
     recupera o METAR da localidade
+
+    :param fs_date (str): date to search
+    :param fs_location (str): location
+
+    :returns: location data if found else None
     """
     # request de dados horários da estação
     l_response = requests.get(DS_REDEMET_URL.format(DS_REDEMET_KEY, fs_date, fs_location))

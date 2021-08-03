@@ -26,12 +26,17 @@ M_LOG = logging.getLogger(__name__)
 M_LOG.setLevel(df.DI_LOG_LEVEL)
 
 # -------------------------------------------------------------------------------------------------
-def inmet_get_location(fs_dia, fs_station):
+def inmet_get_location(fs_date, fs_station):
     """
     recupera os dados da localidade
+
+    :param fs_date (str): date to search
+    :param fs_station (str): station
+
+    :returns: station data if found else None
     """
     # request de dados horários da estação
-    l_response = requests.get(DS_INMET_URL.format(fs_dia, fs_station))
+    l_response = requests.get(DS_INMET_URL.format(fs_date, fs_station))
 
     # ok ?
     if 200 == l_response.status_code:

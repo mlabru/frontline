@@ -148,7 +148,7 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
     assert lo_metaf
 
     # save to BDC
-    sb.bdc_save_metaf(lo_metaf, f_bdc)
+    sb.bdc_save_metaf(fdt_gmt, lo_metaf, f_bdc)
 
     # filename
     ls_file = pathlib.PurePath(fs_file).name
@@ -167,17 +167,15 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
 
     if lo_metar:
         # save to BDC
-        sb.bdc_save_metar(lo_metar, f_bdc)
+        sb.bdc_save_metar(fdt_gmt, lo_metar, f_bdc)
 
         # make METSAR from REDEMET data
-        mg.make_metsar_from_metar(ls_file, ls_icao_code, lo_metar, lo_metaf, f_bdc)
+        mg.make_metsar_from_metar(fdt_gmt, ls_file, ls_icao_code, lo_metar, lo_metaf, f_bdc)
 
     # senão, estação não encontrada na REDEMET. Tenta INMET
     else:
         # format date
         ls_dia = fdt_gmt.strftime("%Y-%m-%d")
-        # format hour
-        ls_hour = fdt_gmt.strftime("%H") + "00"
 
         # get closer station
         ls_station, lf_altitude = ll.find_near_station(ls_icao_code)
@@ -196,7 +194,7 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
 
         if llst_station_data:
             # make METSAR from station data
-            mg.make_metsar_from_station_data(ls_file, ls_icao_code, ls_hour, llst_station_data, lf_altitude, lo_metaf, f_bdc)
+            mg.make_metsar_from_station_data(fdt_gmt, ls_file, ls_icao_code, llst_station_data, lf_altitude, lo_metaf, f_bdc)
 
         # senão,...
         else:

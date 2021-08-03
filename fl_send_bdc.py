@@ -43,26 +43,27 @@ def bdc_connect(fs_user=DS_USER, fs_pass=DS_PASS, fs_host=DS_HOST, fs_db=DS_DB):
     return l_bdc
 
 # -------------------------------------------------------------------------------------------------
-def bdc_save_metaf(fo_metaf, f_bdc):
+def bdc_save_metaf(fdt_gmt, fo_metaf, f_bdc):
     """
     write metaf data to BDC
+           
+    :param fdt_gmt (datetime): date GMT
+    :param fo_metaf (SMETAR): carrapato METAF
+    :param f_bdc (conn): connection to BDC
     """
-    # convert date & time
-    ldt_today = datetime.date.today()
-
     # metaf date
-    ls_day = fo_metaf.s_forecast_time[:2]
-    ls_hour = fo_metaf.s_forecast_time[2:4]
-    ls_min = fo_metaf.s_forecast_time[4:6]
+    # ls_day = fo_metaf.s_forecast_time[:2]
+    # ls_hour = fo_metaf.s_forecast_time[2:4]
+    # ls_min = fo_metaf.s_forecast_time[4:6]
 
     # build date & time
-    ldt_date = datetime.date(ldt_today.year, ldt_today.month, int(ls_day))
-    ldt_time = datetime.time(int(ls_hour), int(ls_min))
+    ldt_date = datetime.date(fdt_gmt)
+    ldt_time = datetime.time(fdt_gmt)
 
     # have visibility ?
     if fo_metaf.i_visibility is None:
         # visibility
-        li_vis = 99999 if fo_metaf.v_cavok else -99999
+        li_vis = 99999 if fo_metaf.v_cavok else "null"
 
     # senão, have visibility
     else:
@@ -88,21 +89,22 @@ def bdc_save_metaf(fo_metaf, f_bdc):
     M_LOG.debug("save metaf: %s", str(ls_query))
 
 # -------------------------------------------------------------------------------------------------
-def bdc_save_metar(fo_metar, f_bdc):
+def bdc_save_metar(fdt_gmt, fo_metar, f_bdc):
     """
     write metar data to BDC
-    """
-    # convert date & time
-    ldt_today = datetime.date.today()
 
+    :param fdt_gmt (datetime): date GMT
+    :param fo_metar (SMETAR): METAR from location
+    :param f_bdc (conn): connection to BDC
+    """
     # metar date
-    ls_day = fo_metar.s_forecast_time[:2]
-    ls_hour = fo_metar.s_forecast_time[2:4]
-    ls_min = fo_metar.s_forecast_time[4:6]
+    # ls_day = fo_metar.s_forecast_time[:2]
+    # ls_hour = fo_metar.s_forecast_time[2:4]
+    # ls_min = fo_metar.s_forecast_time[4:6]
 
     # build date & time
-    ldt_date = datetime.date(ldt_today.year, ldt_today.month, int(ls_day))
-    ldt_time = datetime.time(int(ls_hour), int(ls_min))
+    ldt_date = datetime.date(fdt_gmt)
+    ldt_time = datetime.time(fdt_gmt)
 
     # have visibility ?
     if fo_metar.i_visibility is None:
@@ -133,17 +135,26 @@ def bdc_save_metar(fo_metar, f_bdc):
     M_LOG.debug("save metar: %s", str(ls_query))
 
 # -------------------------------------------------------------------------------------------------
-def bdc_save_metsar(fs_icao_code, fs_day, fs_time, fi_tabs, fi_tpo,
+def bdc_save_metsar(fdt_gmt, fs_icao_code, fi_tabs, fi_tpo,
                     fi_wvel, fi_wdir, fi_wraj, fi_vis, fi_qnh, fs_mesg, f_bdc):
     """
     write metsar data to BDC
-    """
-    # convert date & time
-    ldt_today = datetime.date.today()
 
+    :param fdt_gmt (datetime): date GMT
+    :param fs_icao_code (str):
+    :param fi_tabs (int): temperature
+    :param fi_tpo (int): dewpoint
+    :param fi_wvel (int): wind vel
+    :param fi_wdir (int): wind dir
+    :param fi_wraj (int): wind gust
+    :param fi_vis (int): visibility
+    :param fi_qnh (int): QNH
+    :param fs_mesg (str): METAR from location
+    :param f_bdc (conn): connection to BDC
+    """
     # build date & time
-    ldt_date = datetime.date(ldt_today.year, ldt_today.month, int(fs_day))
-    ldt_time = datetime.time(int(fs_time[:2]), int(fs_time[2:]))
+    ldt_date = datetime.date(fdt_gmt)
+    ldt_time = datetime.time(fdt_gmt)
 
     # make query
     ls_query = "insert into metsar(sigla_aerodromo, dt_metsar, hr_metsar, temperatura_ar, " \
