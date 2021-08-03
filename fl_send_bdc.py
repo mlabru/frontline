@@ -7,7 +7,6 @@ fl_send_bdc
 # < imports >--------------------------------------------------------------------------------------
 
 # python library
-import datetime
 import logging
 
 # postgres
@@ -57,8 +56,8 @@ def bdc_save_metaf(fdt_gmt, fo_metaf, f_bdc):
     # ls_min = fo_metaf.s_forecast_time[4:6]
 
     # build date & time
-    ldt_date = datetime.date(fdt_gmt)
-    ldt_time = datetime.time(fdt_gmt)
+    ldt_date = fdt_gmt.date()
+    ldt_time = fdt_gmt.time()
 
     # have visibility ?
     if fo_metaf.i_visibility is None:
@@ -103,8 +102,8 @@ def bdc_save_metar(fdt_gmt, fo_metar, f_bdc):
     # ls_min = fo_metar.s_forecast_time[4:6]
 
     # build date & time
-    ldt_date = datetime.date(fdt_gmt)
-    ldt_time = datetime.time(fdt_gmt)
+    ldt_date = fdt_gmt.date()
+    ldt_time = fdt_gmt.time()
 
     # have visibility ?
     if fo_metar.i_visibility is None:
@@ -153,8 +152,8 @@ def bdc_save_metsar(fdt_gmt, fs_icao_code, fi_tabs, fi_tpo,
     :param f_bdc (conn): connection to BDC
     """
     # build date & time
-    ldt_date = datetime.date(fdt_gmt)
-    ldt_time = datetime.time(fdt_gmt)
+    ldt_date = fdt_gmt.date()
+    ldt_time = fdt_gmt.time()
 
     # make query
     ls_query = "insert into metsar(sigla_aerodromo, dt_metsar, hr_metsar, temperatura_ar, " \
