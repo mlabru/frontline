@@ -107,7 +107,7 @@ def bdc_save_metar(fo_metar, f_bdc):
     # have visibility ?
     if fo_metar.i_visibility is None:
         # visibility
-        li_vis = 99999 if fo_metar.v_cavok else -99999
+        li_vis = 99999 if fo_metar.v_cavok else "null"
 
     # senão, have visibility
     else:
