@@ -81,7 +81,7 @@ def get_date_range(f_args):
         # build initial date
         ldt_fnl = ldt_fnl.replace(minute=0)
 
-        # calculate difference
+        # calculate difference in hours
         li_delta = ldt_fnl - ldt_ini
         li_delta = int(li_delta.total_seconds() / 3600)
 
@@ -133,7 +133,7 @@ def parse_date(fs_data):
 
     # return date in datetime format
     return ldt_date
-'''
+
 # -------------------------------------------------------------------------------------------------
 def trata_carrapato(fdt_gmt, fs_file, f_bdc):
     """
@@ -164,7 +164,6 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
 
     # try to get data from REDEMET
     lo_metar = rm.redemet_get_location(ls_date, ls_icao_code)
-    # M_LOG.debug("REDEMET lo_metar: %s", str(lo_metar))
 
     if lo_metar:
         # save to BDC
@@ -194,7 +193,6 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
 
         # try to get data from INMET
         llst_station_data = im.inmet_get_location(ls_dia, ls_station)
-        # M_LOG.debug("INMET llst_station_data: %s", str(llst_station_data))
 
         if llst_station_data:
             # make METSAR from station data
@@ -207,7 +205,7 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
 
             # logger
             M_LOG.error("station data not found. METSAR from METAF (carrapato).")
-'''
+
 # -------------------------------------------------------------------------------------------------
 def main():
     """
