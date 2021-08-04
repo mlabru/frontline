@@ -177,7 +177,7 @@ def grp_vis(fo_metaf):
             ls_vis = "CAVOK"
 
             # visibility
-            li_vis = 99999
+            li_vis = df.DI_VIS_CAVOK
 
     # senão, have visibility
     else:
@@ -378,14 +378,14 @@ def make_metsar_from_metar(fdt_gmt, fs_file, fs_icao_code, fo_metar, fo_metaf, f
             # visibility
             ls_vis = fo_metar.s_visibility
             # visibility
-            li_vis = fo_metar.i_visibility if fo_metar.i_visibility is not None else 99999
+            li_vis = fo_metar.i_visibility if fo_metar.i_visibility is not None else df.DI_VIS_CAVOK
 
         # senão, try METAF
         elif fo_metaf.i_visibility or fo_metaf.v_cavok:
             # visibility
             ls_vis = fo_metaf.s_visibility
             # visibility
-            li_vis = fo_metaf.i_visibility if fo_metaf.i_visibility is not None else 99999
+            li_vis = fo_metaf.i_visibility if fo_metaf.i_visibility is not None else df.DI_VIS_CAVOK
 
         # senão,...
         else:

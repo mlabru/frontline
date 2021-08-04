@@ -39,6 +39,9 @@ DS_OUT_DIR = "frontlines"
 DS_TICKS_DIR = "carrapatos"
 
 
+# maximum visibility (CAVOK)
+DI_VIS_CAVOK = 10000
+
 # weahter state messages
 DDCT_WEATHER = {"DZ":     "Drizzle.",
                 "-DZ":    "Light drizzle.",

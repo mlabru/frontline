@@ -62,7 +62,7 @@ def bdc_save_metaf(fdt_gmt, fo_metaf, f_bdc):
     # have visibility ?
     if fo_metaf.i_visibility is None:
         # visibility
-        li_vis = 99999 if fo_metaf.v_cavok else "null"
+        li_vis = df.DI_VIS_CAVOK if fo_metaf.v_cavok else "null"
 
     # senão, have visibility
     else:
@@ -108,7 +108,7 @@ def bdc_save_metar(fdt_gmt, fo_metar, f_bdc):
     # have visibility ?
     if fo_metar.i_visibility is None:
         # visibility
-        li_vis = 99999 if fo_metar.v_cavok else "null"
+        li_vis = df.DI_VIS_CAVOK if fo_metar.v_cavok else "null"
 
     # senão, have visibility
     else:

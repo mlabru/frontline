@@ -69,7 +69,7 @@ def get_date_range(f_args):
         # datetime object containing current date and time, but 3 hours ahead (GMT)
         ldt_ini = datetime.datetime.now() + datetime.timedelta(hours=df.DI_DIFF_GMT)
         # build initial date
-        ldt_ini = ldt_ini.replace(minute=0)
+        ldt_ini = ldt_ini
 
     # just initial date ?
     elif ("x" != f_args.dini) and ("x" == f_args.dfnl):
@@ -106,7 +106,7 @@ def get_date_range(f_args):
         li_delta = int(li_delta.total_seconds() / 3600)
 
     # return initial date and delta in hours
-    return ldt_ini, li_delta
+    return ldt_ini.replace(minute=0, second=0, microsecond=0), li_delta
 
 # -------------------------------------------------------------------------------------------------
 def parse_date(fs_data):
