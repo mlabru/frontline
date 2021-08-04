@@ -7,6 +7,7 @@ fl_data_inmet
 # < imports >--------------------------------------------------------------------------------------
 
 # python library
+import functools
 import json
 import logging
 import requests
@@ -26,6 +27,7 @@ M_LOG = logging.getLogger(__name__)
 M_LOG.setLevel(df.DI_LOG_LEVEL)
 
 # -------------------------------------------------------------------------------------------------
+@functools.lru_cache(maxsize=2048)
 def inmet_get_location(fs_date, fs_station):
     """
     recupera os dados da localidade

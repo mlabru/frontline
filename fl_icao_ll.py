@@ -7,6 +7,7 @@ fl_icao_ll
 # < imports >--------------------------------------------------------------------------------------
 
 # python library
+import functools
 import json
 import logging
 import math
@@ -141,6 +142,7 @@ if 200 == response.status_code:
                                                             float(ldct_station["VL_LONGITUDE"]), 0.)
 
 # -------------------------------------------------------------------------------------------------
+@functools.lru_cache(maxsize=128)
 def find_near_station(fs_icao_code):
     """
     find near station from ICAO Code

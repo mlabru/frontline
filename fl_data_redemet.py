@@ -7,6 +7,7 @@ fl_data_redemet
 # < imports >--------------------------------------------------------------------------------------
 
 # python library
+import functools
 import json
 import logging
 import requests
@@ -30,6 +31,7 @@ M_LOG = logging.getLogger(__name__)
 M_LOG.setLevel(df.DI_LOG_LEVEL)
 
 # -------------------------------------------------------------------------------------------------
+@functools.lru_cache(maxsize=2048)
 def redemet_get_location(fs_date, fs_location):
     """
     recupera o METAR da localidade
