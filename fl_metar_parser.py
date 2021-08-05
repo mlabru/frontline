@@ -32,9 +32,6 @@ class SMetar:
 
         :param fs_metar_mesg (str): METAR message
         """
-        # logger
-        M_LOG.debug("fs_metar_mesg: %s", fs_metar_mesg)
-
         # metar data
         self._s_metar_mesg = fs_metar_mesg
 

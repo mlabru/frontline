@@ -29,11 +29,6 @@ import fl_send_bdc as sb
 M_LOG = logging.getLogger(__name__)
 M_LOG.setLevel(df.DI_LOG_LEVEL)
 
-# counters
-li_count_none = 0
-li_count_inmet = 0
-li_count_redemet = 0
-
 # -------------------------------------------------------------------------------------------------
 def arg_parse():
     """
@@ -134,7 +129,7 @@ def parse_date(fs_data):
         M_LOG.error("Date format error: %s.", lerr)
 
         # abort
-        sys.exit(-1) 
+        sys.exit(-1)
 
     # return date in datetime format
     return ldt_date
@@ -148,13 +143,6 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
     :param fs_file (str): carrapato filename
     :param f_bdc (conn): connection to BDC
     """
-    # globals
-    global li_count_none, li_count_inmet, li_count_redemet
-
-    # logger
-    M_LOG.debug("find_near_station.hits...: %d", ll.find_near_station.cache_info().hits)
-    M_LOG.debug("inmet_get_location.hits..: %d", im.inmet_get_location.cache_info().hits)
-
     # get metaf data
     lo_metaf = mp.metar_parse_file(fs_file)
     assert lo_metaf
@@ -174,17 +162,10 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
     # build date
     ls_date = fdt_gmt.strftime("%Y%m%d%H")
 
-    # logger
-    M_LOG.warning("Location: %s  Date: %s", ls_icao_code, ls_date) 
-    M_LOG.warning("Hits REDEMET: %d  INMET: %d  None: %d", li_count_redemet, li_count_inmet, li_count_none)
-
     # try to get data from REDEMET
     lo_metar = rm.redemet_get_location(ls_date, ls_icao_code)
 
     if lo_metar:
-        # count
-        li_count_redemet += 1
-
         # save to BDC
         sb.bdc_save_metar(fdt_gmt, lo_metar, f_bdc)
 
@@ -204,7 +185,7 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
             # gera METSAR from METAF (carrapato)
             mg.make_metsar_from_file(ls_file)
             # logger
-            M_LOG.warning("near station not found. METSAR from METAF (carrapato).")
+            M_LOG.error("near station not found. METSAR from METAF (carrapato).")
             # return
             return
 
@@ -212,17 +193,11 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
         llst_station_data = im.inmet_get_location(ls_dia, ls_station)
 
         if llst_station_data:
-            # count
-            li_count_inmet += 1
-
             # make METSAR from station data
             mg.make_metsar_from_station_data(fdt_gmt, ls_file, ls_icao_code, llst_station_data, lf_altitude, lo_metaf, f_bdc)
 
         # senão,...
         else:
-            # count
-            li_count_none += 1
-
             # gera METSAR from METAF (carrapato)
             mg.make_metsar_from_file(ls_file)
 
@@ -249,7 +224,6 @@ def main():
 
     # date range
     ldt_ini, li_delta = get_date_range(l_args)
-    M_LOG.debug("ldt_ini: %s  li_delta: %d", ldt_ini, li_delta)
 
     # for all dates...
     for li_i in range(li_delta):

@@ -6,9 +6,6 @@ fl_send_bdc
 """
 # < imports >--------------------------------------------------------------------------------------
 
-# python library
-import logging
-
 # postgres
 import psycopg2
 
@@ -22,12 +19,6 @@ DS_HOST = "172.18.30.21"
 DS_USER = "dwclimatologia"
 DS_PASS = "dwclimatologia"
 DS_DB = "dw_climatologia"
-
-# < module data >----------------------------------------------------------------------------------
-
-# logger
-M_LOG = logging.getLogger(__name__)
-M_LOG.setLevel(df.DI_LOG_LEVEL)
 
 # -------------------------------------------------------------------------------------------------
 def bdc_connect(fs_user=DS_USER, fs_pass=DS_PASS, fs_host=DS_HOST, fs_db=DS_DB):
@@ -85,7 +76,6 @@ def bdc_save_metaf(fdt_gmt, fo_metaf, f_bdc):
 
     # write to BDC
     bdc_write(f_bdc, ls_query)
-    M_LOG.debug("save metaf: %s", str(ls_query))
 
 # -------------------------------------------------------------------------------------------------
 def bdc_save_metar(fdt_gmt, fo_metar, f_bdc):
@@ -131,7 +121,6 @@ def bdc_save_metar(fdt_gmt, fo_metar, f_bdc):
 
     # write to BDC
     bdc_write(f_bdc, ls_query)
-    M_LOG.debug("save metar: %s", str(ls_query))
 
 # -------------------------------------------------------------------------------------------------
 def bdc_save_metsar(fdt_gmt, fs_icao_code, fi_tabs, fi_tpo,
@@ -171,7 +160,6 @@ def bdc_save_metsar(fdt_gmt, fs_icao_code, fi_tabs, fi_tpo,
 
     # write to BDC
     bdc_write(f_bdc, ls_query)
-    M_LOG.debug("save metsar: %s", str(ls_query))
 
 # -------------------------------------------------------------------------------------------------
 def bdc_write(f_bdc, fs_query):
