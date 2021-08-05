@@ -143,6 +143,11 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
     :param fs_file (str): carrapato filename
     :param f_bdc (conn): connection to BDC
     """
+    # logger
+    M_LOG.warning("find_near_station.hits...: %d", ll.find_near_station.cache_info().hits)
+    M_LOG.warning("inmet_get_location.hits..: %d", im.inmet_get_location.cache_info().hits)
+    M_LOG.warning("redemet_get_location.hits: %d", rm.redemet_get_location.cache_info().hits)
+
     # get metaf data
     lo_metaf = mp.metar_parse_file(fs_file)
     assert lo_metaf
