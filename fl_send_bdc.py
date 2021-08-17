@@ -72,7 +72,7 @@ def bdc_save_metaf(fdt_gmt, fo_metaf, f_bdc):
                fo_metaf.i_gust_kt if fo_metaf.i_gust_kt is not None else "null",
                li_vis,
                fo_metaf.i_pressure_hpa if fo_metaf.i_pressure_hpa is not None else "null",
-               "METAF " + fo_metaf.s_metar_mesg)
+               fo_metaf.s_metar_mesg)
 
     # write to BDC
     bdc_write(f_bdc, ls_query)
@@ -117,7 +117,7 @@ def bdc_save_metar(fdt_gmt, fo_metar, f_bdc):
                fo_metar.i_gust_kt if fo_metar.i_gust_kt is not None else "null",
                li_vis,
                fo_metar.i_pressure_hpa if fo_metar.i_pressure_hpa is not None else "null",
-               "METAR " + fo_metar.s_metar_mesg)
+               fo_metar.s_metar_mesg)
 
     # write to BDC
     bdc_write(f_bdc, ls_query)
