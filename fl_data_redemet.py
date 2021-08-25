@@ -60,8 +60,6 @@ if 200 == l_response.status_code:
                 # save aeródromo
                 DDCT_AERODROMOS[ls_icao.strip().upper()] = (lf_lat, lf_lng)
 
-print("DDCT_AERODROMOS:", DDCT_AERODROMOS)
-
 # -------------------------------------------------------------------------------------------------
 def redemet_get_location(fs_date, fs_location):
     """

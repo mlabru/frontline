@@ -154,7 +154,7 @@ def trata_aerodromo(fdt_gmt, fs_icao_code, f_bdc):
         sb.bdc_save_metar(fdt_gmt, lo_metar, f_bdc)
 
         # output filename
-        ls_out = "{}/saida_frontline_{}_{}.txt".format(df.DS_OUT_DIR, fs_icao_code, ls_date)
+        ls_out = "saida_frontline_{}_{}.txt".format(fs_icao_code, ls_date)
 
         # make METSAR from REDEMET data
         mg.make_metsar_from_metar(fdt_gmt, ls_out, fs_icao_code, lo_metar, f_bdc)
@@ -227,7 +227,7 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
             # senão,...
             else:
                 # logger
-                M_LOG.error("station data not found. METSAR from METAF (carrapato).")
+                M_LOG.error("not found station data for %s. METSAR from METAF (carrapato).", ls_station)
 
                 # gera METSAR from METAF (carrapato)
                 mg.make_metsar_from_file(ls_file)
@@ -235,7 +235,7 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
         # senão,...
         else:
             # logger
-            M_LOG.error("near station not found. METSAR from METAF (carrapato).")
+            M_LOG.error("not found near station for %s. METSAR from METAF (carrapato).", ls_icao_code)
 
             # gera METSAR from METAF (carrapato)
             mg.make_metsar_from_file(ls_file)
@@ -273,10 +273,13 @@ def main():
             # trata carrapato
             trata_carrapato(ldt_ini, ls_file, l_bdc)
 
+        # logger
+        M_LOG.error("Lista de aeródromos sem METAF: %s", rm.DDCT_AERODROMOS)
+
         # for all remaining aeródromos...
         for ls_code in rm.DDCT_AERODROMOS:
             # trata aeródromo
-            trata_aerodromo(ldt_ini, ls_file, l_bdc)
+            trata_aerodromo(ldt_ini, ls_code, l_bdc)
 
         # save new initial
         ldt_ini += ldt_1hour
