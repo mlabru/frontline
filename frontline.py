@@ -135,6 +135,36 @@ def parse_date(fs_data):
     return ldt_date
 
 # -------------------------------------------------------------------------------------------------
+def trata_aerodromo(fdt_gmt, fs_icao_code, f_bdc):
+    """
+    trata aerodromo
+
+    :param fdt_gmt (datetime): date GMT
+    :param fs_icao_code (str): ICAO code
+    :param f_bdc (conn): connection to BDC
+    """
+    # build date
+    ls_date = fdt_gmt.strftime("%Y%m%d%H")
+
+    # try to get data from REDEMET
+    lo_metar = rm.redemet_get_location(ls_date, fs_icao_code)
+
+    if lo_metar:
+        # save to BDC
+        sb.bdc_save_metar(fdt_gmt, lo_metar, f_bdc)
+
+        # output filename
+        ls_out = "{}/saida_frontline_{}_{}.txt".format(df.DS_OUT_DIR, fs_icao_code, ls_date)
+
+        # make METSAR from REDEMET data
+        mg.make_metsar_from_metar(fdt_gmt, ls_out, fs_icao_code, lo_metar, f_bdc)
+
+    # senão,...
+    else:
+        # logger
+        M_LOG.error("not found METAR for %s at %s.", fs_icao_code, ls_date)
+
+# -------------------------------------------------------------------------------------------------
 def trata_carrapato(fdt_gmt, fs_file, f_bdc):
     """
     trata carrapato
@@ -169,40 +199,46 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
         # save to BDC
         sb.bdc_save_metar(fdt_gmt, lo_metar, f_bdc)
 
+        # output filename
+        ls_out = ls_file.replace("carrapato", "frontline")
+
         # make METSAR from REDEMET data
-        mg.make_metsar_from_metar(fdt_gmt, ls_file, ls_icao_code, lo_metar, lo_metaf, f_bdc)
+        mg.ensamble_metar_metaf(fdt_gmt, ls_out, ls_icao_code, lo_metar, lo_metaf, f_bdc)
+
+        # remove from dictionary
+        rm.DDCT_AERODROMOS.pop(ls_icao_code, None)
 
     # senão, estação não encontrada na REDEMET. Tenta INMET
     else:
         # format date
         ls_dia = fdt_gmt.strftime("%Y-%m-%d")
 
-        # get closer station
+        # get closest station
         ls_station, lf_altitude = ll.find_near_station(ls_icao_code)
 
-        # ok ?
-        if ls_station is None:
-            # gera METSAR from METAF (carrapato)
-            mg.make_metsar_from_file(ls_file)
-            # logger
-            M_LOG.error("near station not found. METSAR from METAF (carrapato).")
-            # return
-            return
+        if ls_station:
+            # try to get data from INMET
+            llst_station_data = im.inmet_get_location(ls_dia, ls_station)
 
-        # try to get data from INMET
-        llst_station_data = im.inmet_get_location(ls_dia, ls_station)
+            if llst_station_data:
+                # make METSAR from station data
+                mg.ensamble_station_data_metaf(fdt_gmt, ls_file, ls_icao_code, llst_station_data, lf_altitude, lo_metaf, f_bdc)
 
-        if llst_station_data:
-            # make METSAR from station data
-            mg.make_metsar_from_station_data(fdt_gmt, ls_file, ls_icao_code, llst_station_data, lf_altitude, lo_metaf, f_bdc)
+            # senão,...
+            else:
+                # logger
+                M_LOG.error("station data not found. METSAR from METAF (carrapato).")
+
+                # gera METSAR from METAF (carrapato)
+                mg.make_metsar_from_file(ls_file)
 
         # senão,...
         else:
+            # logger
+            M_LOG.error("near station not found. METSAR from METAF (carrapato).")
+
             # gera METSAR from METAF (carrapato)
             mg.make_metsar_from_file(ls_file)
-
-            # logger
-            M_LOG.error("station data not found. METSAR from METAF (carrapato).")
 
 # -------------------------------------------------------------------------------------------------
 def main():
@@ -236,6 +272,11 @@ def main():
         for ls_file in glob.glob("{}/saida_carrapato_{}_{}.txt".format(df.DS_TICKS_DIR, ls_station, ls_date)):
             # trata carrapato
             trata_carrapato(ldt_ini, ls_file, l_bdc)
+
+        # for all remaining aeródromos...
+        for ls_code in rm.DDCT_AERODROMOS:
+            # trata aeródromo
+            trata_aerodromo(ldt_ini, ls_file, l_bdc)
 
         # save new initial
         ldt_ini += ldt_1hour
