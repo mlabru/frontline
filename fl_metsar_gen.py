@@ -267,76 +267,76 @@ def ensamble_metar_metaf(fdt_gmt, fs_fout, fs_icao_code, fo_metar, fo_metaf, f_b
     :param fo_metaf (SMETAR): METAF from carrapato
     :param f_bdc (conn): connection to BDC
     """
+    # time
+    ls_time = fo_metar.s_forecast_time
+
+    # wind
+    ls_wind = fo_metaf.s_wind        if fo_metar.s_wind        is None else fo_metar.s_wind
+    li_wvel = fo_metaf.i_wind_vel_kt if fo_metar.i_wind_vel_kt is None else fo_metar.i_wind_vel_kt
+
+    # vento sem direção ?
+    if fo_metar.i_wind_dir is None:
+        # direção do vento
+        li_wdir = fo_metaf.i_wind_dir if fo_metar.i_wind_vel_kt is None else 270
+
+    # senão, vento tem direção
+    else:
+        # direção do METAR
+        li_wdir = fo_metar.i_wind_dir
+
+    # rajada
+    li_wraj = fo_metaf.i_gust_kt if fo_metar.i_gust_kt is None else fo_metar.i_gust_kt
+
+    # wind var
+    ls_wind += "" if fo_metar.s_wind_var is None else " " + fo_metar.s_wind_var
+
+    # METAR have visibility or cavok ?
+    if fo_metar.i_visibility or fo_metar.v_cavok:
+        # visibility
+        ls_vis = fo_metar.s_visibility
+        # visibility
+        li_vis = fo_metar.i_visibility if fo_metar.i_visibility is not None else df.DI_VIS_CAVOK
+
+    # senão, try METAF
+    elif fo_metaf.i_visibility or fo_metaf.v_cavok:
+        # visibility
+        ls_vis = fo_metaf.s_visibility
+        # visibility
+        li_vis = fo_metaf.i_visibility if fo_metaf.i_visibility is not None else df.DI_VIS_CAVOK
+
+    # senão,...
+    else:
+        # visibility
+        ls_vis = ""
+        # visibility
+        li_vis = None
+        
+    # temperature
+    ls_temp = fo_metaf.s_temperature   if fo_metar.s_temperature   is None else fo_metar.s_temperature
+    li_tabs = fo_metaf.i_temperature_c if fo_metar.i_temperature_c is None else fo_metar.i_temperature_c
+    li_tpo  = fo_metaf.i_dewpoint_c    if fo_metar.i_dewpoint_c    is None else fo_metar.i_dewpoint_c
+
+    # pressure
+    ls_qnh = fo_metaf.s_pressure     if fo_metar.s_pressure     is None else fo_metar.s_pressure
+    li_qnh = fo_metaf.i_pressure_hpa if fo_metar.i_pressure_hpa is None else fo_metar.i_pressure_hpa
+
+    # build message
+    ls_mesg = "METSAR {} {} {} {} {} {}=".format(fs_icao_code, ls_time, ls_wind, ls_vis, ls_temp, ls_qnh)
+
     # create output file
     with open (pathlib.PurePath(df.DS_OUT_DIR).joinpath(fs_fout), "w") as lfh_out:
-        # time
-        ls_time = fo_metar.s_forecast_time
-
-        # wind
-        ls_wind = fo_metaf.s_wind        if fo_metar.s_wind        is None else fo_metar.s_wind
-        li_wvel = fo_metaf.i_wind_vel_kt if fo_metar.i_wind_vel_kt is None else fo_metar.i_wind_vel_kt
-
-        # vento sem direção ?
-        if fo_metar.i_wind_dir is None:
-            # direção do vento
-            li_wdir = fo_metaf.i_wind_dir if fo_metar.i_wind_vel_kt is None else 270
-
-        # senão, vento tem direção
-        else:
-            # direção do METAR
-            li_wdir = fo_metar.i_wind_dir
-
-        # rajada
-        li_wraj = fo_metaf.i_gust_kt if fo_metar.i_gust_kt is None else fo_metar.i_gust_kt
-
-        # wind var
-        ls_wind += "" if fo_metar.s_wind_var is None else " " + fo_metar.s_wind_var
-
-        # METAR have visibility or cavok ?
-        if fo_metar.i_visibility or fo_metar.v_cavok:
-            # visibility
-            ls_vis = fo_metar.s_visibility
-            # visibility
-            li_vis = fo_metar.i_visibility if fo_metar.i_visibility is not None else df.DI_VIS_CAVOK
-
-        # senão, try METAF
-        elif fo_metaf.i_visibility or fo_metaf.v_cavok:
-            # visibility
-            ls_vis = fo_metaf.s_visibility
-            # visibility
-            li_vis = fo_metaf.i_visibility if fo_metaf.i_visibility is not None else df.DI_VIS_CAVOK
-
-        # senão,...
-        else:
-            # visibility
-            ls_vis = ""
-            # visibility
-            li_vis = None
-            
-        # temperature
-        ls_temp = fo_metaf.s_temperature   if fo_metar.s_temperature   is None else fo_metar.s_temperature
-        li_tabs = fo_metaf.i_temperature_c if fo_metar.i_temperature_c is None else fo_metar.i_temperature_c
-        li_tpo  = fo_metaf.i_dewpoint_c    if fo_metar.i_dewpoint_c    is None else fo_metar.i_dewpoint_c
-
-        # pressure
-        ls_qnh = fo_metaf.s_pressure     if fo_metar.s_pressure     is None else fo_metar.s_pressure
-        li_qnh = fo_metaf.i_pressure_hpa if fo_metar.i_pressure_hpa is None else fo_metar.i_pressure_hpa
-
-        # build message
-        ls_mesg = "METSAR {} {} {} {} {} {}=".format(fs_icao_code, ls_time, ls_wind, ls_vis, ls_temp, ls_qnh)
-
         # write output file
         lfh_out.write(ls_mesg)
 
-        # write METSAR to BDC
-        sb.bdc_save_metsar(fdt_gmt,
-                           fs_icao_code,
-                           li_tabs, li_tpo,
-                           li_wvel, li_wdir, li_wraj,
-                           li_vis,
-                           li_qnh,
-                           ls_mesg,
-                           f_bdc)
+    # write METSAR to BDC
+    sb.bdc_save_metsar(fdt_gmt,
+                       fs_icao_code,
+                       li_tabs, li_tpo,
+                       li_wvel, li_wdir, li_wraj,
+                       li_vis,
+                       li_qnh,
+                       ls_mesg,
+                       f_bdc)
 
 # -------------------------------------------------------------------------------------------------
 def ensamble_station_data_metaf(fdt_gmt, fs_file, fs_icao_code, flst_station_data, ff_altitude, fo_metaf, f_bdc):
@@ -358,41 +358,41 @@ def ensamble_station_data_metaf(fdt_gmt, fs_file, fs_icao_code, flst_station_dat
     for ldct_reg in flst_station_data:
         # right hour ?
         if ls_hour == ldct_reg["HR_MEDICAO"].strip():
+            # time
+            ls_time = grp_time(ldct_reg)
+
+            # wind
+            ls_wind, li_wvel, li_wdir, li_wraj = grp_wind(ldct_reg, fo_metaf)
+
+            # visibility
+            ls_vis, li_vis = grp_vis(fo_metaf)
+
+            # temperature
+            ls_temp, li_tabs, li_tpo = grp_temp(ldct_reg, fo_metaf)
+
+            # pressure
+            ls_qnh, li_qnh = grp_qnh(ldct_reg, ff_altitude, fo_metaf)
+
+            # build message
+            ls_mesg = "METSAR {} {} {} {} {} {}=".format(fs_icao_code, ls_time, ls_wind, ls_vis, ls_temp, ls_qnh)
+
             # output filename
             ls_out = fs_file.replace("carrapato", "frontline")
 
             # create output file
             with open (pathlib.PurePath(df.DS_OUT_DIR).joinpath(ls_out), "w") as lfh_out:
-                # time
-                ls_time = grp_time(ldct_reg)
-
-                # wind
-                ls_wind, li_wvel, li_wdir, li_wraj = grp_wind(ldct_reg, fo_metaf)
-
-                # visibility
-                ls_vis, li_vis = grp_vis(fo_metaf)
-
-                # temperature
-                ls_temp, li_tabs, li_tpo = grp_temp(ldct_reg, fo_metaf)
-
-                # pressure
-                ls_qnh, li_qnh = grp_qnh(ldct_reg, ff_altitude, fo_metaf)
-
-                # build message
-                ls_mesg = "METSAR {} {} {} {} {} {}=".format(fs_icao_code, ls_time, ls_wind, ls_vis, ls_temp, ls_qnh)
-
                 # write output file
                 lfh_out.write(ls_mesg)
 
-                # write METSAR to BDC
-                sb.bdc_save_metsar(fdt_gmt,
-                                   fs_icao_code,
-                                   li_tabs, li_tpo,
-                                   li_wvel, li_wdir, li_wraj,
-                                   li_vis,
-                                   li_qnh,
-                                   ls_mesg,
-                                   f_bdc)
+            # write METSAR to BDC
+            sb.bdc_save_metsar(fdt_gmt,
+                               fs_icao_code,
+                               li_tabs, li_tpo,
+                               li_wvel, li_wdir, li_wraj,
+                               li_vis,
+                               li_qnh,
+                               ls_mesg,
+                               f_bdc)
             # quit
             break
 
@@ -434,72 +434,72 @@ def make_metsar_from_metar(fdt_gmt, fs_fout, fs_icao_code, fo_metar, f_bdc):
     :param fo_metar (SMETAR): location METAR
     :param f_bdc (conn): connection to BDC
     """
-    # create output file
-    with open (pathlib.PurePath(df.DS_OUT_DIR).joinpath(fs_fout), "w") as lfh_out:
-        # time
-        ls_time = fo_metar.s_forecast_time
+    # time
+    ls_time = fo_metar.s_forecast_time
 
-        # wind
-        ls_wind = "" if fo_metar.s_wind        is None else fo_metar.s_wind
-        li_wvel =  0 if fo_metar.i_wind_vel_kt is None else fo_metar.i_wind_vel_kt
+    # wind
+    ls_wind = "" if fo_metar.s_wind        is None else fo_metar.s_wind
+    li_wvel =  0 if fo_metar.i_wind_vel_kt is None else fo_metar.i_wind_vel_kt
 
-        # vento sem direção ?
-        if fo_metar.i_wind_dir is None:
-            # direção do vento
-            li_wdir = 0 if fo_metar.i_wind_vel_kt is None else 270
+    # vento sem direção ?
+    if fo_metar.i_wind_dir is None:
+        # direção do vento
+        li_wdir = 0 if fo_metar.i_wind_vel_kt is None else 270
 
-        # senão, vento tem direção
-        else:
-            # direção do METAR
-            li_wdir = fo_metar.i_wind_dir
+    # senão, vento tem direção
+    else:
+        # direção do METAR
+        li_wdir = fo_metar.i_wind_dir
 
-        # rajada
-        li_wraj = 0 if fo_metar.i_gust_kt is None else fo_metar.i_gust_kt
+    # rajada
+    li_wraj = 0 if fo_metar.i_gust_kt is None else fo_metar.i_gust_kt
 
-        # wind var
-        ls_wind += "" if fo_metar.s_wind_var is None else " " + fo_metar.s_wind_var
+    # wind var
+    ls_wind += "" if fo_metar.s_wind_var is None else " " + fo_metar.s_wind_var
 
-        # METAR have visibility or cavok ?
-        if fo_metar.i_visibility or fo_metar.v_cavok:
-            # visibility
-            ls_vis = fo_metar.s_visibility
-            # visibility
-            li_vis = fo_metar.i_visibility if fo_metar.i_visibility is not None else df.DI_VIS_CAVOK
+    # METAR have visibility or cavok ?
+    if fo_metar.i_visibility or fo_metar.v_cavok:
+        # visibility
+        ls_vis = fo_metar.s_visibility
+        # visibility
+        li_vis = fo_metar.i_visibility if fo_metar.i_visibility is not None else df.DI_VIS_CAVOK
 
-        # senão,...
-        else:
-            # visibility
-            ls_vis = ""
-            # visibility
-            li_vis = None
-            
-        # temperature
-        ls_temp = "" if fo_metar.s_temperature   is None else fo_metar.s_temperature
-        li_tabs =  0 if fo_metar.i_temperature_c is None else fo_metar.i_temperature_c
-        li_tpo  =  0 if fo_metar.i_dewpoint_c    is None else fo_metar.i_dewpoint_c
+    # senão,...
+    else:
+        # visibility
+        ls_vis = ""
+        # visibility
+        li_vis = None
+        
+    # temperature
+    ls_temp = "" if fo_metar.s_temperature   is None else fo_metar.s_temperature
+    li_tabs =  0 if fo_metar.i_temperature_c is None else fo_metar.i_temperature_c
+    li_tpo  =  0 if fo_metar.i_dewpoint_c    is None else fo_metar.i_dewpoint_c
 
-        # pressure
-        ls_qnh = "" if fo_metar.s_pressure     is None else fo_metar.s_pressure
-        li_qnh =  0 if fo_metar.i_pressure_hpa is None else fo_metar.i_pressure_hpa
+    # pressure
+    ls_qnh = "" if fo_metar.s_pressure     is None else fo_metar.s_pressure
+    li_qnh =  0 if fo_metar.i_pressure_hpa is None else fo_metar.i_pressure_hpa
 
-        # build message
-        ls_mesg = "METSAR {} {} {} {} {} {}=".format(fs_icao_code, ls_time, ls_wind, ls_vis, ls_temp, ls_qnh)
+    # build message
+    ls_mesg = "METSAR {} {} {} {} {} {}=".format(fs_icao_code, ls_time, ls_wind, ls_vis, ls_temp, ls_qnh)
 
-        # ok to site ?
-        if (fo_metar.s_wind is not None) and \
-           (fo_metar.s_temperature is not None) and \
-           (fo_metar.s_pressure is not None):
+    # ok to site ?
+    if (fo_metar.s_wind is not None) and \
+       (fo_metar.s_temperature is not None) and \
+       (fo_metar.s_pressure is not None):
+        # create output file
+        with open (pathlib.PurePath(df.DS_OUT_DIR).joinpath(fs_fout), "w") as lfh_out:
             # write output file
             lfh_out.write(ls_mesg)
 
-        # write METSAR to BDC
-        sb.bdc_save_metsar(fdt_gmt,
-                           fs_icao_code,
-                           li_tabs, li_tpo,
-                           li_wvel, li_wdir, li_wraj,
-                           li_vis,
-                           li_qnh,
-                           ls_mesg,
-                           f_bdc)
+    # write METSAR to BDC
+    sb.bdc_save_metsar(fdt_gmt,
+                       fs_icao_code,
+                       li_tabs, li_tpo,
+                       li_wvel, li_wdir, li_wraj,
+                       li_vis,
+                       li_qnh,
+                       ls_mesg,
+                       f_bdc)
 
 # < the end >--------------------------------------------------------------------------------------
