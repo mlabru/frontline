@@ -11,6 +11,7 @@ import logging
 import math
 import pathlib
 import shutil
+import subprocess
 
 # local
 import fl_defs as df
@@ -413,9 +414,14 @@ def make_metsar_from_file(fs_file):
     # output filename
     ls_out = fs_file.replace("carrapato", "frontline")
 
+    # output filename
+    lo_out = pathlib.PurePath(df.DS_OUT_DIR).joinpath(ls_out)
+
     # save METSAR
-    shutil.copyfile(pathlib.PurePath(df.DS_TICKS_DIR).joinpath(fs_file),
-                    pathlib.PurePath(df.DS_OUT_DIR).joinpath(ls_out))
+    shutil.copyfile(pathlib.PurePath(df.DS_TICKS_DIR).joinpath(fs_file), lo_out)
+
+    # replace
+    subprocess.call(["sed", "-i", "-e", "s/METAF/METSAR/g", str(lo_out)])
 
 # -------------------------------------------------------------------------------------------------
 def make_metsar_from_metar(fdt_gmt, fs_fout, fs_icao_code, fo_metar, f_bdc):
@@ -479,8 +485,12 @@ def make_metsar_from_metar(fdt_gmt, fs_fout, fs_icao_code, fo_metar, f_bdc):
         # build message
         ls_mesg = "METSAR {} {} {} {} {} {}=".format(fs_icao_code, ls_time, ls_wind, ls_vis, ls_temp, ls_qnh)
 
-        # write output file
-        lfh_out.write(ls_mesg)
+        # ok to site ?
+        if (fo_metar.s_wind is not None) and \
+           (fo_metar.s_temperature is not None) and \
+           (fo_metar.s_pressure is not None):
+            # write output file
+            lfh_out.write(ls_mesg)
 
         # write METSAR to BDC
         sb.bdc_save_metsar(fdt_gmt,

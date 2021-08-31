@@ -38,7 +38,7 @@ def arg_parse():
     :returns: arguments
     """
     # create parser
-    l_parser = argparse.ArgumentParser(description="Fontline (Carrapato Killer).")
+    l_parser = argparse.ArgumentParser(description="Frontline (Carrapato Killer).")
     assert l_parser
 
     # args
@@ -152,7 +152,7 @@ def trata_aerodromo(fdt_gmt, fs_icao_code, f_bdc):
     if lo_metar:
         # save to BDC
         sb.bdc_save_metar(fdt_gmt, lo_metar, f_bdc)
-
+   
         # output filename
         ls_out = "saida_frontline_{}_{}.txt".format(fs_icao_code, ls_date)
 
