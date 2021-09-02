@@ -32,6 +32,9 @@ DF_KT2MPS = 0.514444444
 DF_MPS2KT = 1.943844492
 
 
+# METARs directory
+DS_MET_DIR = "metars"
+
 # frontlines directory
 DS_OUT_DIR = "frontlines"
 

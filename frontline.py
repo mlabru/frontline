@@ -135,6 +135,19 @@ def parse_date(fs_data):
     return ldt_date
 
 # -------------------------------------------------------------------------------------------------
+def save_metar(fs_fout, fs_metar_mesg):
+    """
+    save METAR to file
+
+    :param fs_fout (str): output filename
+    :param fs_metar_mesg (str): METAR message
+    """
+    # create output file
+    with open (pathlib.PurePath(df.DS_MET_DIR).joinpath(fs_fout), "w") as lfh_out:
+        # write output file
+        lfh_out.write(fs_metar_mesg)
+
+# -------------------------------------------------------------------------------------------------
 def trata_aerodromo(fdt_gmt, fs_icao_code, f_bdc):
     """
     trata aerodromo
@@ -155,6 +168,9 @@ def trata_aerodromo(fdt_gmt, fs_icao_code, f_bdc):
    
         # output filename
         ls_out = "saida_frontline_{}_{}.txt".format(fs_icao_code, ls_date)
+
+        # save METAR to file
+        save_metar("metar_{}_{}.txt".format(fs_icao_code, ls_date), lo_metar.s_metar_mesg)
 
         # make METSAR from REDEMET data
         mg.make_metsar_from_metar(fdt_gmt, ls_out, fs_icao_code, lo_metar, f_bdc)
@@ -201,6 +217,9 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
 
         # output filename
         ls_out = ls_file.replace("carrapato", "frontline")
+
+        # save METAR to file
+        save_metar("metar_{}_{}.txt".format(ls_icao_code, ls_date), lo_metar.s_metar_mesg)
 
         # make METSAR from REDEMET data
         mg.ensamble_metar_metaf(fdt_gmt, ls_out, ls_icao_code, lo_metar, lo_metaf, f_bdc)
