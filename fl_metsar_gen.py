@@ -24,6 +24,16 @@ M_LOG = logging.getLogger(__name__)
 M_LOG.setLevel(df.DI_LOG_LEVEL)
 
 # -------------------------------------------------------------------------------------------------
+def grp_clouds(fdct_reg):
+    """
+    group clouds
+
+    :param fdct_reg (dict): station register
+    """
+    # return group clouds
+    return ""
+
+# -------------------------------------------------------------------------------------------------
 def grp_qnh(fdct_reg, ff_altitude, fo_metaf):
     """
     group QNH

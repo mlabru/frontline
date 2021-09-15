@@ -3,6 +3,7 @@
 fl_send_bdc
 
 2021/jul  1.0  mlabru   initial version (Linux/Python)
+2021/sep  1.1  mlabru   implement hidden security
 """
 # < imports >--------------------------------------------------------------------------------------
 
@@ -12,16 +13,23 @@ import psycopg2
 # local
 import fl_defs as df
 
-# < defines >--------------------------------------------------------------------------------------
+# < BDC >------------------------------------------------------------------------------------------
 
 # DB connection
 DS_HOST = "172.18.30.21"
 DS_USER = "dwclimatologia"
-DS_PASS = "dwclimatologia"
 DS_DB = "dw_climatologia"
 
 # -------------------------------------------------------------------------------------------------
-def bdc_connect(fs_user=DS_USER, fs_pass=DS_PASS, fs_host=DS_HOST, fs_db=DS_DB):
+import imp
+
+# open secrets files
+with open(".hidden/secrets.py", "rb") as lfh:
+    # import module
+    hs = imp.load_module(".hidden", lfh, ".hidden/secrets", (".py", "rb", imp.PY_SOURCE))
+
+# -------------------------------------------------------------------------------------------------
+def bdc_connect(fs_user=DS_USER, fs_pass=hs.DS_PASS, fs_host=DS_HOST, fs_db=DS_DB):
     """
     connect to BDC
     """

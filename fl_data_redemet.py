@@ -16,9 +16,6 @@ import fl_metar_parser as mp
 
 # < defines >--------------------------------------------------------------------------------------
 
-# REDEMET API key
-DS_REDEMET_KEY = "w70wXiIZBBMVFhBFS6ApwrC9x24ZU7T7RsdIbZ9f"
-
 # REDEMET
 DS_REDEMET_URL = "https://api-redemet.decea.mil.br/mensagens/metar/{2}?api_key={0}&data_ini={1}&data_fim={1}"
 
@@ -29,8 +26,15 @@ DS_AERODROMOS_URL = "https://api-redemet.decea.mil.br/aerodromos/?api_key={0}&pa
 DDCT_AERODROMOS = {}
 
 # -------------------------------------------------------------------------------------------------
+import imp
+
+# open secrets files
+with open(".hidden/secrets.py", "rb") as lfh:
+    # import module
+    hs = imp.load_module(".hidden", lfh, ".hidden/secrets", (".py", "rb", imp.PY_SOURCE))
+
 # request de dados de aeródromos
-l_response = requests.get(DS_AERODROMOS_URL.format(DS_REDEMET_KEY))
+l_response = requests.get(DS_AERODROMOS_URL.format(hs.DS_REDEMET_KEY))
 
 # ok ?
 if 200 == l_response.status_code:
@@ -71,7 +75,7 @@ def redemet_get_location(fs_date, fs_location):
     :returns: location data if found else None
     """
     # request de dados horários da estação
-    l_response = requests.get(DS_REDEMET_URL.format(DS_REDEMET_KEY, fs_date, fs_location))
+    l_response = requests.get(DS_REDEMET_URL.format(hs.DS_REDEMET_KEY, fs_date, fs_location))
 
     # ok ?
     if 200 == l_response.status_code:
