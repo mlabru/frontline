@@ -44,6 +44,7 @@ class SMetar:
 
         # cloudiness
         self._v_cavok = None
+        self._v_clr = None
         self._v_nsc = None
         self._v_skc = None
         self._v_vv = None
@@ -63,6 +64,8 @@ class SMetar:
         self._v_sct = None
         self._f_sct_m = None
         self._i_sct_feet = None
+
+        self._s_clouds = None
 
         # forecast time
         self._s_forecast_time = None
@@ -153,8 +156,11 @@ class SMetar:
         """
         determining the type of cloudiness
         """
+        # clear clouds
+        self._s_clouds = ""
+
         # search for type of cloudiness
-        l_result = re.findall(r"SKC[0-9]{3}|NSC[0-9]{3}|FEW[0-9]{3}|SCT[0-9]{3}"
+        l_result = re.findall(r"SKC|NSC|CLR|FEW[0-9]{3}|SCT[0-9]{3}"
                               "|BKN[0-9]{3}|OVC[0-9]{3}|VV[0-9]{3}", fs_metar_mesg)
 
         for ls_type_cloud in l_result:
@@ -162,6 +168,9 @@ class SMetar:
             if "SKC" == ls_type_cloud:
                 # skc
                 self._v_skc = True
+
+                # save string
+                self._s_clouds += ls_type_cloud + " "
 
                 # logger
                 M_LOG.info("Clouds: Sky is clear.")
@@ -171,8 +180,22 @@ class SMetar:
                 # nsc
                 self._v_nsc = True
 
+                # save string
+                self._s_clouds += ls_type_cloud + " "
+
                 # logger
                 M_LOG.info("Clouds: No significant cloud clouds.")
+
+            # clr ?
+            if "CLR" == ls_type_cloud:
+                # nsc
+                self._v_clr = True
+
+                # save string
+                self._s_clouds += ls_type_cloud + " "
+
+                # logger
+                M_LOG.info("Clouds: No clouds below 3600 m.")
 
             # few ?
             if "FEW" == ls_type_cloud[:-3]:
@@ -181,6 +204,9 @@ class SMetar:
                 self._f_few_m = round(self._i_few_feet * df.DF_FT2M, 2)
                 # few
                 self._v_few = True
+
+                # save string
+                self._s_clouds += ls_type_cloud + " "
 
                 # logger
                 M_LOG.info("Clouds: Few clouds at %d feet (%6.2f meter).", self._i_few_feet, self._f_few_m)
@@ -193,6 +219,9 @@ class SMetar:
                 # sct
                 self._v_sct = True
 
+                # save string
+                self._s_clouds += ls_type_cloud + " "
+
                 # logger
                 M_LOG.info("Clouds: Scattered clouds at %d feet (%6.2f meter).", self._i_sct_feet, self._f_sct_m)
 
@@ -203,6 +232,9 @@ class SMetar:
                 self._f_bkn_m = round(self._i_bkn_feet * df.DF_FT2M, 2)
                 # pwino
                 self._v_bkn = True
+
+                # save string
+                self._s_clouds += ls_type_cloud + " "
 
                 # logger
                 M_LOG.info("Clouds: Broken clouds at %d feet (%6.2f meter).", self._i_bkn_feet, self._f_bkn_m)
@@ -215,6 +247,9 @@ class SMetar:
                 # ovc
                 self._v_ovc = True
 
+                # save string
+                self._s_clouds += ls_type_cloud + " "
+
                 # logger
                 M_LOG.info("Clouds: Overcast clouds at %d feet (%6.2f meter).", self._i_ovc_feet, self._f_ovc_m)
 
@@ -223,8 +258,21 @@ class SMetar:
                 # vv
                 self._v_vv = True
 
+                # save string
+                self._s_clouds += ls_type_cloud + " "
+
                 # logger
                 M_LOG.info("Clouds: Clouds cannot be seen because of fog or heavy precipitation.")
+
+        # exist clouds ?
+        if "" != self._s_clouds:
+            # strip string
+            self._s_clouds = self._s_clouds.strip()
+
+        # senão,...
+        else:
+            # no clouds at all
+            self._s_clouds = None
 
     # ---------------------------------------------------------------------------------------------
     def _forecast_time(self, fs_metar_mesg):
@@ -655,6 +703,12 @@ class SMetar:
     def v_cavok(self):
         """ceiling and visibility flag"""
         return self._v_cavok
+
+    # ---------------------------------------------------------------------------------------------
+    @property
+    def s_clouds(self):
+        """clouds group string"""
+        return self._s_clouds
 
     # ---------------------------------------------------------------------------------------------
     @property
