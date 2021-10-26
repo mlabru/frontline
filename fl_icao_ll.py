@@ -18,6 +18,9 @@ import fl_defs as df
 
 # < defines >--------------------------------------------------------------------------------------
 
+# maximum distance (km)
+DI_MAX_DIST = 50
+
 # ICAO Code lat/lng dictionary
 DDCT_ICAO_LL = {"SBAA": (-8.348611111111111,  -49.303055),
                 "SBAE": (-22.157777777777778, -49.068335),
@@ -86,38 +89,23 @@ M_LOG = logging.getLogger(__name__)
 M_LOG.setLevel(df.DI_LOG_LEVEL)
 
 # -------------------------------------------------------------------------------------------------
-#
-## request de dados de estações manuais
-#response = requests.get("https://apitempo.inmet.gov.br/estacoes/M")
-#
-## ok ?
-#if 200 == response.status_code:
-#    # lista de estações manuais
-#    llst_stations = json.loads(response.text)
-#
-#    # for all stations...
-#    for ldct_station in llst_stations:
-#        # exists altitude ?
-#        if ldct_station["VL_ALTITUDE"] is not None:
-#            # station lat/lng/alt
-#            DDCT_STATIONS_LL[ldct_station["CD_ESTACAO"]] = (float(ldct_station["VL_LATITUDE"]),
-#                                                            float(ldct_station["VL_LONGITUDE"]),
-#                                                            float(ldct_station["VL_ALTITUDE"]))
-#
-#        # senão,...
-#        else:
-#            # station lat/lng/0
-#            DDCT_STATIONS_LL[ldct_station["CD_ESTACAO"]] = (float(ldct_station["VL_LATITUDE"]),
-#                                                            float(ldct_station["VL_LONGITUDE"]), 0.)
-
 # request de dados de estações "tomáticas"
 response = requests.get("https://apitempo.inmet.gov.br/estacoes/T")
 
 # ok ?
 if 200 == response.status_code:
-    # lista de estações tomáticas
-    llst_stations = json.loads(response.text)
+    try:
+        # lista de estações tomáticas
+        llst_stations = json.loads(response.text)
 
+    # em caso de erro...
+    except JSONDecodeError as l_err:
+        # logger
+        M_LOG.error("INMET station data decoding error: %s", str(l_err))
+
+        # quit
+        llst_stations = []
+   
     # for all stations...
     for ldct_station in llst_stations:
         # flag operacional
@@ -184,8 +172,15 @@ def find_near_station(fs_icao_code):
             lf_altitude = lval[2]
 
     # logger
-    # M_LOG.info("near station of %s is %s @ dst: %6.2f(m) alt: %6.2f(m)", fs_icao_code, ls_station, lf_dist, lf_altitude)
+    # M_LOG.info("near station of %s is %s @ dst: %6.2f(km) alt: %6.2f(m)", fs_icao_code, ls_station, lf_dist, lf_altitude)
 
+    # in distance constraint ?
+    if lf_dist > DI_MAX_DIST:
+        # logger
+        M_LOG.warning("Found station too far: %s (%6.2f km)", str(ls_station), lf_dist)
+        # return error
+        return None, None
+        
     # return nearest station
     return ls_station, lf_altitude
 

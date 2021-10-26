@@ -31,10 +31,10 @@ import imp
 # open secrets files
 with open(".hidden/secrets.py", "rb") as lfh:
     # import module
-    hs = imp.load_module(".hidden", lfh, ".hidden/secrets", (".py", "rb", imp.PY_SOURCE))
+    G_HS = imp.load_module(".hidden", lfh, ".hidden/secrets", (".py", "rb", imp.PY_SOURCE))
 
 # request de dados de aeródromos
-l_response = requests.get(DS_AERODROMOS_URL.format(hs.DS_REDEMET_KEY))
+l_response = requests.get(DS_AERODROMOS_URL.format(G_HS.DS_REDEMET_KEY))
 
 # ok ?
 if 200 == l_response.status_code:
@@ -84,7 +84,7 @@ def redemet_get_location(fs_date, fs_location):
     :returns: location data if found else None
     """
     # request de dados horários da estação
-    l_response = requests.get(DS_REDEMET_URL.format(hs.DS_REDEMET_KEY, fs_date, fs_location))
+    l_response = requests.get(DS_REDEMET_URL.format(G_HS.DS_REDEMET_KEY, fs_date, fs_location))
 
     # ok ?
     if 200 == l_response.status_code:
@@ -95,14 +95,15 @@ def redemet_get_location(fs_date, fs_location):
         # em caso de erro...
         except JSONDecodeError as l_err:
             # logger
-            M_LOG.error("REDEMET station data decoding error")
-
+            M_LOG.error("REDEMET station data decoding error: %s", str(l_err))
             # quit
-            return None
+            ldct_data = {}
+            
+        # flag status
+        lv_status = ldct_data.get("status", None)
 
-        # station data ok ?
-        if ldct_data:
-            # data
+        if lv_status is not None and lv_status:
+            # station data
             ldct_data = ldct_data.get("data", None)
 
             if ldct_data:
