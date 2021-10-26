@@ -170,6 +170,45 @@ def bdc_save_metsar(fdt_gmt, fs_icao_code, fi_tabs, fi_tpo,
     bdc_write(f_bdc, ls_query)
 
 # -------------------------------------------------------------------------------------------------
+def bdc_save_metsar_b(fdt_gmt, fs_icao_code, fi_tabs, fi_tpo,
+                      fi_wvel, fi_wdir, fi_wraj, fi_vis, fi_qnh, fs_mesg, f_bdc):
+    """
+    write metsar data to BDC
+
+    :param fdt_gmt (datetime): date GMT
+    :param fs_icao_code (str):
+    :param fi_tabs (int): temperature
+    :param fi_tpo (int): dewpoint
+    :param fi_wvel (int): wind vel
+    :param fi_wdir (int): wind dir
+    :param fi_wraj (int): wind gust
+    :param fi_vis (int): visibility
+    :param fi_qnh (int): QNH
+    :param fs_mesg (str): METAR from location
+    :param f_bdc (conn): connection to BDC
+    """
+    # build date & time
+    ldt_date = fdt_gmt.date()
+    ldt_time = fdt_gmt.time()
+
+    # make query
+    ls_query = "insert into metsar_b(sigla_aerodromo, dt_metsar, hr_metsar, temperatura_ar, " \
+               "temperatura_po, velocidade_vento, direcao_vento, rajada, visibilidade, " \
+               "qnh, mensagem) values ('{}', '{}', '{}', {}, {}, {}, {}, {}, {}, {}, " \
+               "'{}')".format(fs_icao_code, ldt_date, ldt_time,
+               fi_tabs if fi_tabs is not None else "null",
+               fi_tpo if fi_tpo is not None else "null",
+               fi_wvel if fi_wvel is not None else "null",
+               fi_wdir if fi_wdir is not None else "null",
+               fi_wraj if fi_wraj is not None else "null",
+               fi_vis if fi_vis is not None else "null",
+               fi_qnh if fi_qnh is not None else "null",
+               fs_mesg)
+
+    # write to BDC
+    bdc_write(f_bdc, ls_query)
+
+# -------------------------------------------------------------------------------------------------
 def bdc_write(f_bdc, fs_query):
     """
     execute query on BDC

@@ -349,7 +349,7 @@ def ensamble_metar_metaf(fdt_gmt, fs_fout, fs_icao_code, fo_metar, fo_metaf, f_b
                        f_bdc)
 
 # -------------------------------------------------------------------------------------------------
-def ensamble_station_data_metaf(fdt_gmt, fs_file, fs_icao_code, flst_station_data, ff_altitude, fo_metaf, f_bdc):
+def ensamble_station_data_metaf(fdt_gmt, fs_file, fs_icao_code, flst_station_data, ff_altitude, fo_metaf, f_bdc, fv_test):
     """
     generate METSAR from station data
 
@@ -360,6 +360,7 @@ def ensamble_station_data_metaf(fdt_gmt, fs_file, fs_icao_code, flst_station_dat
     :param ff_altitude (float): station altitude (ft)
     :param fo_metaf (SMETAR): METAF from carrapato
     :param f_bdc (conn): connection to BDC
+    :param fv_test (bool): test falg
     """
     # format hour
     ls_hour = fdt_gmt.strftime("%H") + "00"
@@ -394,15 +395,27 @@ def ensamble_station_data_metaf(fdt_gmt, fs_file, fs_icao_code, flst_station_dat
                 # write output file
                 lfh_out.write(ls_mesg)
 
-            # write METSAR to BDC
-            sb.bdc_save_metsar(fdt_gmt,
-                               fs_icao_code,
-                               li_tabs, li_tpo,
-                               li_wvel, li_wdir, li_wraj,
-                               li_vis,
-                               li_qnh,
-                               ls_mesg,
-                               f_bdc)
+            if fv_test:
+                # write METSAR to BDC
+                sb.bdc_save_metsar_b(fdt_gmt,
+                                     fs_icao_code,
+                                     li_tabs, li_tpo,
+                                     li_wvel, li_wdir, li_wraj,
+                                     li_vis,
+                                     li_qnh,
+                                     ls_mesg,
+                                     f_bdc)
+
+            else:
+                # write METSAR to BDC
+                sb.bdc_save_metsar(fdt_gmt,
+                                   fs_icao_code,
+                                   li_tabs, li_tpo,
+                                   li_wvel, li_wdir, li_wraj,
+                                   li_vis,
+                                   li_qnh,
+                                   ls_mesg,
+                                   f_bdc)
             # quit
             break
 

@@ -38,8 +38,17 @@ l_response = requests.get(DS_AERODROMOS_URL.format(hs.DS_REDEMET_KEY))
 
 # ok ?
 if 200 == l_response.status_code:
-    # aeródromos data
-    ldct_data = json.loads(l_response.text)
+    try:
+        # decode REDEMET station data
+        ldct_data = json.loads(l_response.text)
+
+    # em caso de erro...
+    except JSONDecodeError as l_err:
+        # logger
+        M_LOG.error("REDEMET station data decoding error")
+
+        # quit
+        ldct_data = {}
 
     # flag status
     lv_status = ldct_data.get("status", None)
@@ -79,9 +88,19 @@ def redemet_get_location(fs_date, fs_location):
 
     # ok ?
     if 200 == l_response.status_code:
-        # REDEMET station data
-        ldct_data = json.loads(l_response.text)
+        try:
+            # decode REDEMET station data
+            ldct_data = json.loads(l_response.text)
 
+        # em caso de erro...
+        except JSONDecodeError as l_err:
+            # logger
+            M_LOG.error("REDEMET station data decoding error")
+
+            # quit
+            return None
+
+        # station data ok ?
         if ldct_data:
             # data
             ldct_data = ldct_data.get("data", None)
