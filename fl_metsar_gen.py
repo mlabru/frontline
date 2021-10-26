@@ -349,7 +349,7 @@ def ensamble_metar_metaf(fdt_gmt, fs_fout, fs_icao_code, fo_metar, fo_metaf, f_b
                        f_bdc)
 
 # -------------------------------------------------------------------------------------------------
-def ensamble_station_data_metaf(fdt_gmt, fs_file, fs_icao_code, flst_station_data, ff_altitude, fo_metaf, f_bdc, fv_test):
+def ensamble_station_data_metaf(fdt_gmt, fs_file, fs_icao_code, flst_station_data, ff_altitude, fo_metaf, f_bdc):
     """
     generate METSAR from station data
 
@@ -360,7 +360,6 @@ def ensamble_station_data_metaf(fdt_gmt, fs_file, fs_icao_code, flst_station_dat
     :param ff_altitude (float): station altitude (ft)
     :param fo_metaf (SMETAR): METAF from carrapato
     :param f_bdc (conn): connection to BDC
-    :param fv_test (bool): test falg
     """
     # format hour
     ls_hour = fdt_gmt.strftime("%H") + "00"
@@ -395,37 +394,81 @@ def ensamble_station_data_metaf(fdt_gmt, fs_file, fs_icao_code, flst_station_dat
                 # write output file
                 lfh_out.write(ls_mesg)
 
-            if fv_test:
-                # write METSAR to BDC
-                sb.bdc_save_metsar_b(fdt_gmt,
-                                     fs_icao_code,
-                                     li_tabs, li_tpo,
-                                     li_wvel, li_wdir, li_wraj,
-                                     li_vis,
-                                     li_qnh,
-                                     ls_mesg,
-                                     f_bdc)
-
-            else:
-                # write METSAR to BDC
-                sb.bdc_save_metsar(fdt_gmt,
-                                   fs_icao_code,
-                                   li_tabs, li_tpo,
-                                   li_wvel, li_wdir, li_wraj,
-                                   li_vis,
-                                   li_qnh,
-                                   ls_mesg,
-                                   f_bdc)
+            # write METSAR to BDC
+            sb.bdc_save_metsar(fdt_gmt,
+                               fs_icao_code,
+                               li_tabs, li_tpo,
+                               li_wvel, li_wdir, li_wraj,
+                               li_vis,
+                               li_qnh,
+                               ls_mesg,
+                               f_bdc)
             # quit
             break
 
     # senão,...
     else:
+        # logger
+        M_LOG.error("station hour not found. METSAR from METAF (carrapato).")
+
         # gera METSAR from carrapato
         make_metsar_from_file(fs_file)
 
+# -------------------------------------------------------------------------------------------------
+def ensamble_station_data_metaf_b(fdt_gmt, fs_file, fs_icao_code, flst_station_data, ff_altitude, fo_metaf, f_bdc):
+    """
+    generate METSAR_B from station data
+
+    :param fdt_gmt (datetime): processing date
+    :param fs_file (str): carrapato filename
+    :param fs_icao_code (str): aerodrome ICAO Code
+    :param flst_station_data (lst): station data register
+    :param ff_altitude (float): station altitude (ft)
+    :param fo_metaf (SMETAR): METAF from carrapato
+    :param f_bdc (conn): connection to BDC
+    """
+    # format hour
+    ls_hour = fdt_gmt.strftime("%H") + "00"
+
+    # for all station data...
+    for ldct_reg in flst_station_data:
+        # right hour ?
+        if ls_hour == ldct_reg["HR_MEDICAO"].strip():
+            # time
+            ls_time = grp_time(ldct_reg)
+
+            # wind
+            ls_wind, li_wvel, li_wdir, li_wraj = grp_wind(ldct_reg, fo_metaf)
+
+            # visibility
+            ls_vis, li_vis = grp_vis(fo_metaf)
+
+            # temperature
+            ls_temp, li_tabs, li_tpo = grp_temp(ldct_reg, fo_metaf)
+
+            # pressure
+            ls_qnh, li_qnh = grp_qnh(ldct_reg, ff_altitude, fo_metaf)
+
+            # build message
+            ls_mesg = "METSAR {} {} {} {} {} {}=".format(fs_icao_code, ls_time, ls_wind, ls_vis, ls_temp, ls_qnh)
+
+            # write METSAR_B to BDC
+            sb.bdc_save_metsar_b(fdt_gmt,
+                                 fs_icao_code,
+                                 li_tabs, li_tpo,
+                                 li_wvel, li_wdir, li_wraj,
+                                 li_vis,
+                                 li_qnh,
+                                 ls_mesg,
+                                 f_bdc)
+
+            # quit
+            break
+
+    # senão,...
+    else:
         # logger
-        M_LOG.error("station hour not found. METSAR from METAF (carrapato).")
+        M_LOG.error("station data for this time does not exist. Skipping.")
 
 # -------------------------------------------------------------------------------------------------
 def make_metsar_from_file(fs_file):
