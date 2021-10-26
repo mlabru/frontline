@@ -235,11 +235,16 @@ class SMetar:
         # search for forecast time
         l_result = re.search(r"[0-9]{6}[Z]", fs_metar_mesg)
 
-        # forecast time
-        self._s_forecast_time = str(l_result[0])
+        if l_result:
+            # forecast time
+            self._s_forecast_time = str(l_result[0])
 
-        # logger
-        M_LOG.info("Time issued: %s %s:%s.", l_result[0][:2], l_result[0][2:4], l_result[0][4:6])
+            # logger
+            M_LOG.info("Time issued: %s %s:%s.", l_result[0][:2], l_result[0][2:4], l_result[0][4:6])
+
+        else:
+            # logger
+            M_LOG.error("forecast time is mandatory.")
 
     # ---------------------------------------------------------------------------------------------
     def _icao_code(self, fs_metar_mesg):
@@ -249,11 +254,16 @@ class SMetar:
         # search for icao code
         l_result = re.search(r"[A-Z]{4}", fs_metar_mesg)
 
-        # icao code
-        self._s_icao_code = str(l_result[0])
+        if l_result:
+            # icao code
+            self._s_icao_code = str(l_result[0])
 
-        # logger
-        M_LOG.info("Identifier: %s.", self._s_icao_code)
+            # logger
+            M_LOG.info("Identifier: %s.", self._s_icao_code)
+
+        else:
+            # logger
+            M_LOG.error("ICAO code is mandatory.")
 
     # ---------------------------------------------------------------------------------------------
     def _pressure(self, fs_metar_mesg):

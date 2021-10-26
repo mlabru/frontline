@@ -44,10 +44,12 @@ def arg_parse():
     # args
     l_parser.add_argument("-c", "--code", dest="code", action="store", default="x",
                           help="ICAO code.")
-    l_parser.add_argument("-i", "--dini", dest="dini", action="store", default="x",
-                          help="Initial date.")
     l_parser.add_argument("-f", "--dfnl", dest="dfnl", action="store", default="x",
                           help="Final date.")
+    l_parser.add_argument("-i", "--dini", dest="dini", action="store", default="x",
+                          help="Initial date.")
+    l_parser.add_argument("-t", "--test", dest="test", action="store_true",
+                          help="Test flag.")
 
     # return arguments
     return l_parser.parse_args()
@@ -148,7 +150,7 @@ def save_metar(fs_fout, fs_metar_mesg):
         lfh_out.write(fs_metar_mesg)
 
 # -------------------------------------------------------------------------------------------------
-def trata_aerodromo(fdt_gmt, fs_icao_code, f_bdc):
+def trata_aerodromo(fdt_gmt, fs_icao_code, f_bdc, fv_test):
     """
     trata aerodromo
 
@@ -160,7 +162,7 @@ def trata_aerodromo(fdt_gmt, fs_icao_code, f_bdc):
     ls_date = fdt_gmt.strftime("%Y%m%d%H")
 
     # try to get data from REDEMET
-    lo_metar = rm.redemet_get_location(ls_date, fs_icao_code)
+    lo_metar = rm.redemet_get_location(ls_date, fs_icao_code) if not fv_test else None
 
     if lo_metar:
         # save to BDC
@@ -181,13 +183,14 @@ def trata_aerodromo(fdt_gmt, fs_icao_code, f_bdc):
         M_LOG.error("not found METAR for %s at %s.", fs_icao_code, ls_date)
 
 # -------------------------------------------------------------------------------------------------
-def trata_carrapato(fdt_gmt, fs_file, f_bdc):
+def trata_carrapato(fdt_gmt, fs_file, f_bdc, fv_test):
     """
     trata carrapato
 
     :param fdt_gmt (datetime): date GMT
     :param fs_file (str): carrapato filename
     :param f_bdc (conn): connection to BDC
+    :param fv_test (bool): test flag
     """
     # get metaf data
     lo_metaf = mp.metar_parse_file(fs_file)
@@ -209,7 +212,7 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
     ls_date = fdt_gmt.strftime("%Y%m%d%H")
 
     # try to get data from REDEMET
-    lo_metar = rm.redemet_get_location(ls_date, ls_icao_code)
+    lo_metar = rm.redemet_get_location(ls_date, ls_icao_code) if not fv_test else None
 
     if lo_metar:
         # save to BDC
@@ -241,7 +244,7 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
 
             if llst_station_data:
                 # make METSAR from station data
-                mg.ensamble_station_data_metaf(fdt_gmt, ls_file, ls_icao_code, llst_station_data, lf_altitude, lo_metaf, f_bdc)
+                mg.ensamble_station_data_metaf(fdt_gmt, ls_file, ls_icao_code, llst_station_data, lf_altitude, lo_metaf, f_bdc, fv_test)
 
             # senão,...
             else:
@@ -290,15 +293,15 @@ def main():
         # find all stations in directory...
         for ls_file in glob.glob("{}/saida_carrapato_{}_{}.txt".format(df.DS_TICKS_DIR, ls_station, ls_date)):
             # trata carrapato
-            trata_carrapato(ldt_ini, ls_file, l_bdc)
+            trata_carrapato(ldt_ini, ls_file, l_bdc, l_args.test)
 
         # logger
-        M_LOG.error("Lista de aeródromos sem METAF: %s", rm.DDCT_AERODROMOS)
+        M_LOG.info("Lista de aeródromos sem METAF: %s", rm.DDCT_AERODROMOS)
 
         # for all remaining aeródromos...
         for ls_code in rm.DDCT_AERODROMOS:
             # trata aeródromo
-            trata_aerodromo(ldt_ini, ls_code, l_bdc)
+            trata_aerodromo(ldt_ini, ls_code, l_bdc, l_args.test)
 
         # save new initial
         ldt_ini += ldt_1hour
