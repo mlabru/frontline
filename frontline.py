@@ -124,9 +124,9 @@ def parse_date(fs_data):
         ldt_date = ldt_date.replace(minute=0)
 
     # em caso de erro,...
-    except Exception as lerr:
+    except Exception as l_err:
         # logger
-        M_LOG.error("Date format error: %s.", lerr)
+        M_LOG.error("date format error: %s. Aborting.", l_err)
 
         # abort
         sys.exit(-1)
@@ -178,7 +178,7 @@ def trata_aerodromo(fdt_gmt, fs_icao_code, f_bdc):
     # senão,...
     else:
         # logger
-        M_LOG.error("not found METAR for %s at %s.", fs_icao_code, ls_date)
+        M_LOG.error("METAR for %s at %s not found. Skipping.", fs_icao_code, ls_date)
 
 # -------------------------------------------------------------------------------------------------
 def trata_carrapato(fdt_gmt, fs_file, f_bdc):
@@ -246,7 +246,7 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
             # senão,...
             else:
                 # logger
-                M_LOG.error("not found station data for %s. METSAR from METAF (carrapato).", ls_station)
+                M_LOG.error("data for %s not found. METSAR from METAF (carrapato).", ls_station)
 
                 # gera METSAR from METAF (carrapato)
                 mg.make_metsar_from_file(ls_fname)
@@ -254,7 +254,7 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
         # senão,...
         else:
             # logger
-            M_LOG.error("not found near station for %s. METSAR from METAF (carrapato).", ls_icao_code)
+            M_LOG.error("near station from %s not found. METSAR from METAF (carrapato).", ls_icao_code)
 
             # gera METSAR from METAF (carrapato)
             mg.make_metsar_from_file(ls_fname)
