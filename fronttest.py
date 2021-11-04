@@ -24,11 +24,28 @@ import fl_metsar_gen as mg
 import fl_metar_parser as mp
 import fl_send_bdc as sb
 
-# < module data >----------------------------------------------------------------------------------
+# < logging >--------------------------------------------------------------------------------------
 
 # logger
 M_LOG = logging.getLogger(__name__)
-M_LOG.setLevel(df.DI_LOG_LEVEL)
+M_LOG.setLevel(logging.DEBUG)
+
+# create file handler which logs even debug messages
+M_LOG_FH = logging.FileHandler(__name__ + ".log")
+M_LOG_FH.setLevel(logging.DEBUG)
+
+# create console handler with a higher log level
+M_LOG_CH = logging.StreamHandler()
+M_LOG_CH.setLevel(df.DI_LOG_LEVEL)
+
+# create formatter and add it to the handlers
+M_LOG_FRM = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+M_LOG_FH.setFormatter(M_LOG_FRM)
+M_LOG_CH.setFormatter(M_LOG_FRM)
+
+# add the handlers to the logger
+M_LOG.addHandler(M_LOG_FH)
+M_LOG.addHandler(M_LOG_CH)
 
 # -------------------------------------------------------------------------------------------------
 def arg_parse():
