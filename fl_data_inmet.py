@@ -50,7 +50,7 @@ def inmet_get_location(fs_date, fs_station):
             return l_ans
 
         # em caso de erro...
-        except JSONDecodeError as l_err:
+        except json.decoder.JSONDecodeError as l_err:
             # logger
             M_LOG.error("JSON decoding error")
 

@@ -99,7 +99,7 @@ if 200 == response.status_code:
         llst_stations = json.loads(response.text)
 
     # em caso de erro...
-    except JSONDecodeError as l_err:
+    except json.decoder.JSONDecodeError as l_err:
         # logger
         M_LOG.error("INMET station data decoding error: %s", str(l_err))
 

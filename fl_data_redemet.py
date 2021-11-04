@@ -43,7 +43,7 @@ if 200 == l_response.status_code:
         ldct_data = json.loads(l_response.text)
 
     # em caso de erro...
-    except JSONDecodeError as l_err:
+    except json.decoder.JSONDecodeError as l_err:
         # logger
         M_LOG.error("REDEMET station data decoding error")
 
@@ -93,7 +93,7 @@ def redemet_get_location(fs_date, fs_location):
             ldct_data = json.loads(l_response.text)
 
         # em caso de erro...
-        except JSONDecodeError as l_err:
+        except json.decoder.JSONDecodeError as l_err:
             # logger
             M_LOG.error("REDEMET station data decoding error: %s", str(l_err))
             # quit
