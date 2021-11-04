@@ -127,7 +127,7 @@ def parse_date(fs_data):
     # em caso de erro,...
     except Exception as lerr:
         # logger
-        M_LOG.error("Date format error: %s.", lerr)
+        M_LOG.error("date format error: %s.", lerr)
 
         # abort
         sys.exit(-1)
@@ -147,9 +147,6 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
     # get metaf data
     lo_metaf = mp.metar_parse_file(fs_file)
     assert lo_metaf
-
-    # save to BDC
-    sb.bdc_save_metaf(fdt_gmt, lo_metaf, f_bdc)
 
     # filename
     ls_fname = pathlib.PurePath(fs_file).name
@@ -184,7 +181,7 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
             # senão,...
             else:
                 # logger
-                M_LOG.error("not found station data for %s. METSAR_B from METAF (carrapato).", ls_station)
+                M_LOG.error("data for %s not found. METSAR_B from METAF (carrapato).", ls_station)
 
                 # gera METSAR_B from METAF (carrapato)
                 # mg.make_metsar_from_file(ls_fname)
@@ -192,7 +189,7 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
         # senão,...
         else:
             # logger
-            M_LOG.error("not found near station for %s. METSAR_B from METAF (carrapato).", ls_icao_code)
+            M_LOG.error("near station from %s not found. METSAR_B from METAF (carrapato).", ls_icao_code)
 
             # gera METSAR_B from METAF (carrapato)
             # mg.make_metsar_from_file(ls_fname)
