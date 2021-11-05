@@ -177,7 +177,7 @@ def find_near_station(fs_icao_code):
     # in distance constraint ?
     if lf_dist > DI_MAX_DIST:
         # logger
-        M_LOG.warning("Found station too far: %s -> %s (%6.2f km)", str(fs_icao_code), str(ls_station), lf_dist)
+        M_LOG.warning("Found station too far: %s -> %s (%6.2f km).", str(fs_icao_code), str(ls_station), lf_dist)
         # return error
         return None, None
         

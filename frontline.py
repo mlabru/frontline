@@ -13,6 +13,7 @@ import glob
 import logging
 import pathlib
 import sys
+import threading
 
 # local
 import fl_defs as df
@@ -30,21 +31,25 @@ M_LOG = logging.getLogger(__name__)
 M_LOG.setLevel(logging.DEBUG)
 
 # create file handler which logs even debug messages
-M_LOG_FH = logging.FileHandler(__name__ + ".log")
+M_LOG_FH = logging.FileHandler("frontline.log")
 M_LOG_FH.setLevel(logging.DEBUG)
-
-# create console handler with a higher log level
-M_LOG_CH = logging.StreamHandler()
-M_LOG_CH.setLevel(df.DI_LOG_LEVEL)
 
 # create formatter and add it to the handlers
 M_LOG_FRM = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 M_LOG_FH.setFormatter(M_LOG_FRM)
-M_LOG_CH.setFormatter(M_LOG_FRM)
 
 # add the handlers to the logger
 M_LOG.addHandler(M_LOG_FH)
-M_LOG.addHandler(M_LOG_CH)
+
+# create console handler with a higher log level
+# M_LOG_CH = logging.StreamHandler()
+# M_LOG_CH.setLevel(df.DI_LOG_LEVEL)
+
+# add formatter to the handler
+# M_LOG_CH.setFormatter(M_LOG_FRM)
+
+# add the handlers to the logger
+# M_LOG.addHandler(M_LOG_CH)
 
 # -------------------------------------------------------------------------------------------------
 def arg_parse():
@@ -297,25 +302,63 @@ def main():
     # date range
     ldt_ini, li_delta = get_date_range(l_args)
 
+    # create threads list
+    llst_thr_carrapato = [None for _ in range(li_delta)]
+
     # for all dates...
     for li_i in range(li_delta):
         # format full date
         ls_date = ldt_ini.strftime("%Y%m%d%H")
         # logger
-        M_LOG.warning("Processando, estação: %s data: %s", ls_station, ls_date)
+        M_LOG.warning("Processando, estação: %s data: %s.", ls_station, ls_date)
 
         # find all stations in directory...
         for ls_file in glob.glob("{}/saida_carrapato_{}_{}.txt".format(df.DS_TICKS_DIR, ls_station, ls_date)):
-            # trata carrapato
-            trata_carrapato(ldt_ini, ls_file, l_bdc)
+            # logger
+            M_LOG.info("Create and start thread for carrapato %s.", ls_file)
+            
+            # create thread trata carrapato
+            llst_thr_carrapato[li_i] = threading.Thread(target=trata_carrapato, args=(ldt_ini, ls_file, l_bdc))
+            assert llst_thr_carrapato[li_i]
+
+            # exec thread trata carrapato
+            llst_thr_carrapato[li_i].start()
+
+        # for all carrapato threads...
+        for li_ndx, l_thr in enumerate(llst_thr_carrapato):
+            # logger
+            M_LOG.info("Wait for joining carrapato thread %d.", li_ndx)
+            # wait for thread
+            l_thr.join()
+            # logger
+            M_LOG.info("Carrapato thread %d done.", li_ndx)
 
         # logger
-        M_LOG.info("Lista de aeródromos sem METAF: %s", rm.DDCT_AERODROMOS)
+        M_LOG.info("Lista de aeródromos sem METAF: %s.", rm.DDCT_AERODROMOS)
+
+        # create threads list
+        llst_thr_aerodromo = [None for _ in range(len(rm.DDCT_AERODROMOS))]
 
         # for all remaining aeródromos...
-        for ls_code in rm.DDCT_AERODROMOS:
+        for li_ndx, ls_code in enumerate(rm.DDCT_AERODROMOS):
+            # logger
+            M_LOG.info("Create and start thread for aeródromo %s.", ls_code)
+            
             # trata aeródromo
-            trata_aerodromo(ldt_ini, ls_code, l_bdc)
+            llst_thr_aerodromo[li_ndx] = threading.Thread(target=trata_aerodromo, args=(ldt_ini, ls_code, l_bdc))
+            assert llst_thr_aerodromo[li_ndx]
+
+            # exec thread trata aeródromo
+            llst_thr_aerodromo[li_ndx].start()
+
+        # for all aeródromo threads...
+        for li_ndx, l_thr in enumerate(llst_thr_aerodromo):
+            # logger
+            M_LOG.info("Wait for joining aeródromo thread %d.", li_ndx)
+            # wait for thread
+            l_thr.join()
+            # logger
+            M_LOG.info("Aeródromo thread %d done.", li_ndx)
 
         # save new initial
         ldt_ini += ldt_1hour

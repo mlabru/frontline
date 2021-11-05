@@ -409,7 +409,7 @@ def ensamble_station_data_metaf(fdt_gmt, fs_file, fs_icao_code, flst_station_dat
     # senão,...
     else:
         # logger
-        M_LOG.error("station hour not found. METSAR from METAF (carrapato).")
+        M_LOG.error("Station hour not found. METSAR from METAF (carrapato).")
 
         # gera METSAR from carrapato
         make_metsar_from_file(fs_file)
@@ -468,7 +468,7 @@ def ensamble_station_data_metaf_b(fdt_gmt, fs_file, fs_icao_code, flst_station_d
     # senão,...
     else:
         # logger
-        M_LOG.error("station data for this time does not exist. Skipping.")
+        M_LOG.error("Station data for this time does not exist. Skipping.")
 
 # -------------------------------------------------------------------------------------------------
 def make_metsar_from_file(fs_file):
