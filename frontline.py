@@ -28,18 +28,18 @@ import fl_send_bdc as sb
 
 # logger
 M_LOG = logging.getLogger(__name__)
-M_LOG.setLevel(logging.DEBUG)
+M_LOG.setLevel(df.DI_LOG_LEVEL)
 
 # create file handler which logs even debug messages
-M_LOG_FH = logging.FileHandler("frontline.log")
-M_LOG_FH.setLevel(logging.DEBUG)
+# M_LOG_FH = logging.FileHandler("frontline_{}.log".format(datetime.datetime.now().strftime("%Y%m%d-%H%M%S")))
+# M_LOG_FH.setLevel(df.DI_LOG_LEVEL)
 
 # create formatter and add it to the handlers
-M_LOG_FRM = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-M_LOG_FH.setFormatter(M_LOG_FRM)
+# M_LOG_FRM = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+# M_LOG_FH.setFormatter(M_LOG_FRM)
 
 # add the handlers to the logger
-M_LOG.addHandler(M_LOG_FH)
+# M_LOG.addHandler(M_LOG_FH)
 
 # create console handler with a higher log level
 # M_LOG_CH = logging.StreamHandler()
@@ -131,6 +131,21 @@ def get_date_range(f_args):
     return ldt_ini.replace(minute=0, second=0, microsecond=0), li_delta
 
 # -------------------------------------------------------------------------------------------------
+def get_station_code(fs_file):
+    """
+    get ICAO Code from file name
+
+    :param fs_file: received file name
+
+    :returns: ICAO Code
+    """
+    # split file name
+    llst_tmp = fs_file.split('_')
+
+    # return icao code
+    return llst_tmp[2].strip().upper()
+
+# -------------------------------------------------------------------------------------------------
 def parse_date(fs_data):
     """
     parse date
@@ -148,7 +163,7 @@ def parse_date(fs_data):
     # em caso de erro,...
     except Exception as l_err:
         # logger
-        M_LOG.error("date format error: %s. Aborting.", l_err)
+        M_LOG.error("Date format error: %s. Aborting.", l_err)
 
         # abort
         sys.exit(-1)
@@ -188,11 +203,11 @@ def trata_aerodromo(fdt_gmt, fs_icao_code, f_bdc):
         # save to BDC
         sb.bdc_save_metar(fdt_gmt, lo_metar, f_bdc)
    
-        # output filename
-        ls_out = "saida_frontline_{}_{}.txt".format(fs_icao_code, ls_date)
-
         # save METAR to file
         save_metar("metar_{}_{}.txt".format(fs_icao_code, ls_date), lo_metar.s_metar_mesg)
+
+        # output filename
+        ls_out = "saida_frontline_{}_{}.txt".format(fs_icao_code, ls_date)
 
         # make METSAR from REDEMET data
         mg.make_metsar_from_metar(fdt_gmt, ls_out, fs_icao_code, lo_metar, f_bdc)
@@ -221,11 +236,8 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
     # filename
     ls_fname = pathlib.PurePath(fs_file).name
 
-    # split file name
-    llst_tmp = fs_file.split('_')
-
     # icao code
-    ls_icao_code = llst_tmp[2].strip().upper()
+    ls_icao_code = get_station_code(ls_fname)
 
     # build date
     ls_date = fdt_gmt.strftime("%Y%m%d%H")
@@ -246,9 +258,6 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
         # make METSAR from REDEMET data
         mg.ensamble_metar_metaf(fdt_gmt, ls_out, ls_icao_code, lo_metar, lo_metaf, f_bdc)
 
-        # remove from dictionary
-        rm.DDCT_AERODROMOS.pop(ls_icao_code, None)
-
     # senão, estação não encontrada na REDEMET. Tenta INMET
     else:
         # format date
@@ -268,7 +277,7 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
             # senão,...
             else:
                 # logger
-                M_LOG.error("data for %s not found. METSAR from METAF (carrapato).", ls_station)
+                M_LOG.error("Data for %s not found. METSAR from METAF (carrapato).", ls_station)
 
                 # gera METSAR from METAF (carrapato)
                 mg.make_metsar_from_file(ls_fname)
@@ -276,7 +285,7 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
         # senão,...
         else:
             # logger
-            M_LOG.error("near station from %s not found. METSAR from METAF (carrapato).", ls_icao_code)
+            M_LOG.error("Near station from %s not found or too far. METSAR from METAF (carrapato).", ls_icao_code)
 
             # gera METSAR from METAF (carrapato)
             mg.make_metsar_from_file(ls_fname)
@@ -302,63 +311,84 @@ def main():
     # date range
     ldt_ini, li_delta = get_date_range(l_args)
 
-    # create threads list
-    llst_thr_carrapato = [None for _ in range(li_delta)]
-
     # for all dates...
     for li_i in range(li_delta):
         # format full date
         ls_date = ldt_ini.strftime("%Y%m%d%H")
+
         # logger
-        M_LOG.warning("Processando, estação: %s data: %s.", ls_station, ls_date)
+        M_LOG.info("Processando, estação: %s data: %s.", ls_station, ls_date)
+
+        # create trata_carrapato threads list
+        llst_thr_carrapato = list()
 
         # find all stations in directory...
         for ls_file in glob.glob("{}/saida_carrapato_{}_{}.txt".format(df.DS_TICKS_DIR, ls_station, ls_date)):
             # logger
-            M_LOG.info("Create and start thread for carrapato %s.", ls_file)
+            M_LOG.debug("Create and start thread for carrapato %s.", ls_file)
             
-            # create thread trata carrapato
-            llst_thr_carrapato[li_i] = threading.Thread(target=trata_carrapato, args=(ldt_ini, ls_file, l_bdc))
-            assert llst_thr_carrapato[li_i]
+            # create thread trata_carrapato
+            l_thr = threading.Thread(target=trata_carrapato, args=(ldt_ini, ls_file, l_bdc))
+            assert l_thr
 
-            # exec thread trata carrapato
-            llst_thr_carrapato[li_i].start()
-
-        # for all carrapato threads...
-        for li_ndx, l_thr in enumerate(llst_thr_carrapato):
-            # logger
-            M_LOG.info("Wait for joining carrapato thread %d.", li_ndx)
-            # wait for thread
-            l_thr.join()
-            # logger
-            M_LOG.info("Carrapato thread %d done.", li_ndx)
+            # save thread trata_carrapato
+            llst_thr_carrapato.append((get_station_code(ls_file), l_thr))
+            
+            # exec thread trata_carrapato
+            l_thr.start()
 
         # logger
-        M_LOG.info("Lista de aeródromos sem METAF: %s.", rm.DDCT_AERODROMOS)
+        M_LOG.debug("Encontrados %d carrapatos.\n%s", len(llst_thr_carrapato), str(llst_thr_carrapato))
+        
+        # create carrapato ok list
+        llst_carrapato_ok = list()
+
+        # for all carrapato threads...
+        for (ls_station, l_thr) in llst_thr_carrapato:
+            # thread ok ?
+            if l_thr:
+                # wait for thread
+                l_thr.join()
+
+                # save in carrapato ok list
+                llst_carrapato_ok.append(ls_station) 
+
+        # logger
+        M_LOG.debug("Encontrados %d aeródromos na REDEMET.\n%s", len(rm.DDCT_AERODROMOS), rm.DDCT_AERODROMOS)
 
         # create threads list
-        llst_thr_aerodromo = [None for _ in range(len(rm.DDCT_AERODROMOS))]
+        llst_thr_aerodromo = list()
 
         # for all remaining aeródromos...
-        for li_ndx, ls_code in enumerate(rm.DDCT_AERODROMOS):
+        for ls_code in rm.DDCT_AERODROMOS:
+            # carrapato ok ?
+            if ls_code in llst_carrapato_ok:
+                # skip this one
+                continue
+
             # logger
-            M_LOG.info("Create and start thread for aeródromo %s.", ls_code)
+            M_LOG.debug("Create and start thread for aeródromo %s.", ls_code)
             
             # trata aeródromo
-            llst_thr_aerodromo[li_ndx] = threading.Thread(target=trata_aerodromo, args=(ldt_ini, ls_code, l_bdc))
-            assert llst_thr_aerodromo[li_ndx]
+            l_thr = threading.Thread(target=trata_aerodromo, args=(ldt_ini, ls_code, l_bdc))
+            assert l_thr
 
             # exec thread trata aeródromo
-            llst_thr_aerodromo[li_ndx].start()
+            llst_thr_aerodromo.append(l_thr)
 
+            # exec thread trata aeródromo
+            l_thr.start()
+
+        # logger
+        M_LOG.debug("Encontrados %d aeródromos.", len(llst_thr_aerodromo))
+        M_LOG.debug("llst_thr_aerodromo: %s", str(llst_thr_aerodromo))
+        
         # for all aeródromo threads...
-        for li_ndx, l_thr in enumerate(llst_thr_aerodromo):
-            # logger
-            M_LOG.info("Wait for joining aeródromo thread %d.", li_ndx)
-            # wait for thread
-            l_thr.join()
-            # logger
-            M_LOG.info("Aeródromo thread %d done.", li_ndx)
+        for l_thr in llst_thr_aerodromo:
+            # thread ok ?
+            if l_thr:
+                # wait for thread
+                l_thr.join()
 
         # save new initial
         ldt_ini += ldt_1hour

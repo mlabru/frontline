@@ -54,6 +54,11 @@ def inmet_get_location(fs_date, fs_station):
             # logger
             M_LOG.error("INMET station data decoding error: %s.", l_err)
 
+    # senão,...
+    else:
+        # logger
+        M_LOG.error("INMET station data for %s not found. Code: %s", str(fs_station), str(l_response.status_code))
+
     # return error
     return None
 

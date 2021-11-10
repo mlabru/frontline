@@ -90,44 +90,49 @@ M_LOG.setLevel(df.DI_LOG_LEVEL)
 
 # -------------------------------------------------------------------------------------------------
 # request de dados de estações "tomáticas"
-response = requests.get("https://apitempo.inmet.gov.br/estacoes/T")
+M_RESPONSE = requests.get("https://apitempo.inmet.gov.br/estacoes/T")
 
 # ok ?
-if 200 == response.status_code:
+if 200 == M_RESPONSE.status_code:
     try:
         # lista de estações tomáticas
-        llst_stations = json.loads(response.text)
+        MLST_STATIONS = json.loads(M_RESPONSE.text)
 
     # em caso de erro...
-    except json.decoder.JSONDecodeError as l_err:
+    except json.decoder.JSONDecodeError as M_ERR:
         # logger
-        M_LOG.error("INMET station data decoding error: %s", str(l_err))
+        M_LOG.error("INMET station data decoding error: %s", str(M_ERR))
 
         # quit
-        llst_stations = []
+        MLST_STATIONS = []
    
     # for all stations...
-    for ldct_station in llst_stations:
+    for MDCT_STATION in MLST_STATIONS:
         # flag operacional
-        ls_oper = ldct_station.get("CD_SITUACAO", None)
+        MS_OPER = MDCT_STATION.get("CD_SITUACAO", None)
 
         # operacional ?
-        if ls_oper is None or ("Operante" != ls_oper):
+        if MS_OPER is None or ("Operante" != MS_OPER):
             # next
             continue
 
         # exists altitude ?
-        if ldct_station["VL_ALTITUDE"] is not None:
+        if MDCT_STATION["VL_ALTITUDE"] is not None:
             # station lat/lng/alt
-            DDCT_STATIONS_LL[ldct_station["CD_ESTACAO"]] = (float(ldct_station["VL_LATITUDE"]),
-                                                            float(ldct_station["VL_LONGITUDE"]),
-                                                            float(ldct_station["VL_ALTITUDE"]))
+            DDCT_STATIONS_LL[MDCT_STATION["CD_ESTACAO"]] = (float(MDCT_STATION["VL_LATITUDE"]),
+                                                            float(MDCT_STATION["VL_LONGITUDE"]),
+                                                            float(MDCT_STATION["VL_ALTITUDE"]))
 
         # senão,...
         else:
             # station lat/lng/0
-            DDCT_STATIONS_LL[ldct_station["CD_ESTACAO"]] = (float(ldct_station["VL_LATITUDE"]),
-                                                            float(ldct_station["VL_LONGITUDE"]), 0.)
+            DDCT_STATIONS_LL[MDCT_STATION["CD_ESTACAO"]] = (float(MDCT_STATION["VL_LATITUDE"]),
+                                                            float(MDCT_STATION["VL_LONGITUDE"]), 0.)
+
+# senão,...
+else:
+    # logger
+    M_LOG.error("INMET automatic stations data not found. Code: %s", str(M_RESPONSE.status_code))
 
 # -------------------------------------------------------------------------------------------------
 @functools.lru_cache(maxsize=128)
@@ -160,7 +165,7 @@ def find_near_station(fs_icao_code):
     # for all stations...
     for lkey, lval in DDCT_STATIONS_LL.items():
         # great circle distance
-        lf_haver = haversine(lf_lat, lf_lng, lval[0], lval[1])
+        lf_haver = _haversine(lf_lat, lf_lng, lval[0], lval[1])
 
         # found nearest ?
         if lf_haver < lf_dist:
@@ -172,12 +177,12 @@ def find_near_station(fs_icao_code):
             lf_altitude = lval[2]
 
     # logger
-    # M_LOG.info("near station of %s is %s @ dst: %6.2f(km) alt: %6.2f(m)", fs_icao_code, ls_station, lf_dist, lf_altitude)
+    M_LOG.warning("Near station of %s is %s @ dst: %6.2f(km) alt: %6.2f(m)", fs_icao_code, ls_station, lf_dist, lf_altitude)
 
     # in distance constraint ?
     if lf_dist > DI_MAX_DIST:
         # logger
-        M_LOG.warning("Found station too far: %s -> %s (%6.2f km).", str(fs_icao_code), str(ls_station), lf_dist)
+        M_LOG.warning("Near station too far: %s -> %s (%6.2f km).", str(fs_icao_code), str(ls_station), lf_dist)
         # return error
         return None, None
         
@@ -185,7 +190,7 @@ def find_near_station(fs_icao_code):
     return ls_station, lf_altitude
 
 # -------------------------------------------------------------------------------------------------
-def haversine(ff_lat_1, ff_lng_1, ff_lat_2, ff_lng_2):
+def _haversine(ff_lat_1, ff_lng_1, ff_lat_2, ff_lng_2):
     """
     calculate the great circle distance between two points on the earth (specified in decimal degrees)
 
