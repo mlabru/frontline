@@ -2,9 +2,9 @@
 """
 fl_data_inmet
 
-2021/jul  1.0  mlabru   initial version (Linux/Python)
+2021.jul  mlabru  initial version (Linux/Python)
 """
-# < imports >--------------------------------------------------------------------------------------
+# < imports >----------------------------------------------------------------------------------
 
 # python library
 import functools
@@ -15,20 +15,20 @@ import requests
 # local
 import fl_defs as df
 
-# < defines >--------------------------------------------------------------------------------------
+# < constants >--------------------------------------------------------------------------------
 
 # INMET
 DS_INMET_URL = "https://apitempo.inmet.gov.br/estacao/{0}/{0}/{1}"
 
-# < module data >----------------------------------------------------------------------------------
+# < logging >----------------------------------------------------------------------------------
 
 # logger
 M_LOG = logging.getLogger(__name__)
 M_LOG.setLevel(df.DI_LOG_LEVEL)
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 @functools.lru_cache(maxsize=2048)
-def inmet_get_location(fs_date, fs_station):
+def inmet_get_location(fs_date: str, fs_station: str):
     """
     recupera os dados da localidade
 
@@ -62,4 +62,4 @@ def inmet_get_location(fs_date, fs_station):
     # return error
     return None
 
-# < the end >--------------------------------------------------------------------------------------
+# < the end >----------------------------------------------------------------------------------

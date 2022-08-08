@@ -2,10 +2,10 @@
 """
 fronttest
 
-2021/oct  2.0  mlabru   save to METSAR_B
-2021/may  1.0  mlabru   initial version (Linux/Python)
+2021.oct  mlabru   save to METSAR_B
+2021.may  mlabru   initial version (Linux/Python)
 """
-# < imports >--------------------------------------------------------------------------------------
+# < imports >----------------------------------------------------------------------------------
 
 # python library
 import argparse
@@ -24,7 +24,7 @@ import fl_metsar_gen as mg
 import fl_metar_parser as mp
 import fl_send_bdc as sb
 
-# < logging >--------------------------------------------------------------------------------------
+# < logging >----------------------------------------------------------------------------------
 
 # logger
 M_LOG = logging.getLogger(__name__)
@@ -51,7 +51,7 @@ M_LOG.setLevel(df.DI_LOG_LEVEL)
 # add the handlers to the logger
 # M_LOG.addHandler(M_LOG_CH)
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 def arg_parse():
     """
     parse command line arguments
@@ -74,7 +74,7 @@ def arg_parse():
     # return arguments
     return l_parser.parse_args()
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 def get_date_range(f_args):
     """
     get initial and final dates
@@ -130,7 +130,7 @@ def get_date_range(f_args):
     # return initial date and delta in hours
     return ldt_ini.replace(minute=0, second=0, microsecond=0), li_delta
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 def parse_date(fs_data):
     """
     parse date
@@ -156,7 +156,7 @@ def parse_date(fs_data):
     # return date in datetime format
     return ldt_date
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 def trata_carrapato(fdt_gmt, fs_file, f_bdc):
     """
     trata carrapato
@@ -197,12 +197,13 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
 
             if llst_station_data:
                 # make METSAR from station data
-                mg.ensamble_station_data_metaf_b(fdt_gmt, ls_fname, ls_icao_code, llst_station_data, lf_altitude, lo_metaf, f_bdc)
-
+                mg.ensamble_station_data_metaf_b(fdt_gmt, ls_fname, ls_icao_code,
+                    llst_station_data, lf_altitude, lo_metaf, f_bdc)
             # senão,...
             else:
                 # logger
-                M_LOG.error("data for %s not found. METSAR_B from METAF (carrapato).", ls_station)
+                M_LOG.error("data for %s not found. METSAR_B from METAF (carrapato).",
+                            ls_station)
 
                 # gera METSAR_B from METAF (carrapato)
                 # mg.make_metsar_from_file(ls_fname)
@@ -210,12 +211,13 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
         # senão,...
         else:
             # logger
-            M_LOG.error("near station from %s not found. METSAR_B from METAF (carrapato).", ls_icao_code)
+            M_LOG.error("near station from %s not found. METSAR_B from METAF (carrapato).",
+                        ls_icao_code)
 
             # gera METSAR_B from METAF (carrapato)
             # mg.make_metsar_from_file(ls_fname)
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 def main():
     """
     main
@@ -254,7 +256,7 @@ def main():
     # close BDC
     l_bdc.close()
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 # this is the bootstrap process
 
 if "__main__" == __name__:
@@ -267,4 +269,4 @@ if "__main__" == __name__:
     # run application
     sys.exit(main())
 
-# < the end >--------------------------------------------------------------------------------------
+# < the end >----------------------------------------------------------------------------------

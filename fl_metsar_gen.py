@@ -2,9 +2,9 @@
 """
 fl_metsar_gen
 
-2021/may  1.0  mlabru   initial version (Linux/Python)
+2021.may  mlabru   initial version (Linux/Python)
 """
-# < imports >--------------------------------------------------------------------------------------
+# < imports >----------------------------------------------------------------------------------
 
 # python library
 import logging
@@ -17,14 +17,14 @@ import subprocess
 import fl_defs as df
 import fl_send_bdc as sb
 
-# < module data >----------------------------------------------------------------------------------
+# < logging >----------------------------------------------------------------------------------
 
 # logger
 M_LOG = logging.getLogger(__name__)
 M_LOG.setLevel(df.DI_LOG_LEVEL)
 
-# -------------------------------------------------------------------------------------------------
-def grp_clouds(fdct_reg):
+# ---------------------------------------------------------------------------------------------
+def grp_clouds(fdct_reg: dict):
     """
     group clouds
 
@@ -33,8 +33,8 @@ def grp_clouds(fdct_reg):
     # return group clouds
     return ""
 
-# -------------------------------------------------------------------------------------------------
-def grp_qnh(fdct_reg, ff_altitude, fo_metaf):
+# ---------------------------------------------------------------------------------------------
+def grp_qnh(fdct_reg: dict, ff_altitude: float, fo_metaf):
     """
     group QNH
 
@@ -57,8 +57,8 @@ def grp_qnh(fdct_reg, ff_altitude, fo_metaf):
     # return group QNH
     return "Q{:04d}".format(int(lf_qnh)), int(lf_qnh)
 
-# -------------------------------------------------------------------------------------------------
-def grp_temp(fdct_reg, fo_metaf):
+# ---------------------------------------------------------------------------------------------
+def grp_temp(fdct_reg: dict, fo_metaf):
     """
     group temp
 
@@ -156,8 +156,8 @@ def grp_temp(fdct_reg, fo_metaf):
     # return group temp
     return "{}/{}".format(ls_tabs, ls_tpo), li_tabs, li_tpo
 
-# -------------------------------------------------------------------------------------------------
-def grp_time(fdct_reg):
+# ---------------------------------------------------------------------------------------------
+def grp_time(fdct_reg: dict):
     """
     group time
 
@@ -167,7 +167,7 @@ def grp_time(fdct_reg):
     return "{}{}Z".format(fdct_reg["DT_MEDICAO"][-2:],
                           fdct_reg["HR_MEDICAO"])
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 def grp_vis(fo_metaf):
     """
     group visibility
@@ -201,8 +201,8 @@ def grp_vis(fo_metaf):
     # return group visibility
     return ls_vis, li_vis
 
-# -------------------------------------------------------------------------------------------------
-def grp_wind(fdct_reg, fo_metaf):
+# ---------------------------------------------------------------------------------------------
+def grp_wind(fdct_reg: dict, fo_metaf):
     """
     group wind
 
@@ -265,8 +265,8 @@ def grp_wind(fdct_reg, fo_metaf):
     # return group wind
     return "{}KT".format(ls_wind), li_wvel, li_wdir, li_wraj
 
-# -------------------------------------------------------------------------------------------------
-def ensamble_metar_metaf(fdt_gmt, fs_fout, fs_icao_code, fo_metar, fo_metaf, f_bdc):
+# ---------------------------------------------------------------------------------------------
+def ensamble_metar_metaf(fdt_gmt, fs_fout: str, fs_icao_code: str, fo_metar, fo_metaf, f_bdc):
     """
     generate METSAR from location METAR
 
@@ -348,8 +348,9 @@ def ensamble_metar_metaf(fdt_gmt, fs_fout, fs_icao_code, fo_metar, fo_metaf, f_b
                        ls_mesg,
                        f_bdc)
 
-# -------------------------------------------------------------------------------------------------
-def ensamble_station_data_metaf(fdt_gmt, fs_file, fs_icao_code, flst_station_data, ff_altitude, fo_metaf, f_bdc):
+# ---------------------------------------------------------------------------------------------
+def ensamble_station_data_metaf(fdt_gmt, fs_file: str, fs_icao_code: str,
+                                flst_station_data: list, ff_altitude: float, fo_metaf, f_bdc):
     """
     generate METSAR from station data
 
@@ -414,8 +415,9 @@ def ensamble_station_data_metaf(fdt_gmt, fs_file, fs_icao_code, flst_station_dat
         # gera METSAR from carrapato
         make_metsar_from_file(fs_file)
 
-# -------------------------------------------------------------------------------------------------
-def ensamble_station_data_metaf_b(fdt_gmt, fs_file, fs_icao_code, flst_station_data, ff_altitude, fo_metaf, f_bdc):
+# ---------------------------------------------------------------------------------------------
+def ensamble_station_data_metaf_b(fdt_gmt, fs_file: str, fs_icao_code: str, 
+                                  flst_station_data: list, ff_altitude: float, fo_metaf, f_bdc):
     """
     generate METSAR_B from station data
 
@@ -470,8 +472,8 @@ def ensamble_station_data_metaf_b(fdt_gmt, fs_file, fs_icao_code, flst_station_d
         # logger
         M_LOG.error("Station data for this time does not exist. Skipping.")
 
-# -------------------------------------------------------------------------------------------------
-def make_metsar_from_file(fs_file):
+# ---------------------------------------------------------------------------------------------
+def make_metsar_from_file(fs_file: str):
     """
     generate METSAR from carrapato file
 
@@ -489,7 +491,7 @@ def make_metsar_from_file(fs_file):
     # replace
     subprocess.call(["sed", "-i", "-e", "s/METAF/METSAR/g", str(lo_out)])
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 def make_metsar_from_metar(fdt_gmt, fs_fout, fs_icao_code, fo_metar, f_bdc):
     """
     generate METSAR from METAR
@@ -568,4 +570,4 @@ def make_metsar_from_metar(fdt_gmt, fs_fout, fs_icao_code, fo_metar, f_bdc):
                        ls_mesg,
                        f_bdc)
 
-# < the end >--------------------------------------------------------------------------------------
+# < the end >----------------------------------------------------------------------------------

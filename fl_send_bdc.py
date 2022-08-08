@@ -2,34 +2,41 @@
 """
 fl_send_bdc
 
-2021/jul  1.0  mlabru   initial version (Linux/Python)
-2021/sep  1.1  mlabru   implement hidden security
+2021.sep  mlabru  implement hidden security
+2021.jul  mlabru  initial version (Linux/Python)
 """
-# < imports >--------------------------------------------------------------------------------------
+# < imports >----------------------------------------------------------------------------------
+
+# python library
+import logging
+import os
+import typing
 
 # postgres
 import psycopg2
 
+# dotenv
+import dotenv
+
 # local
 import fl_defs as df
 
-# < BDC >------------------------------------------------------------------------------------------
+# < environment >------------------------------------------------------------------------------
+
+# take environment variables from .env
+dotenv.load_dotenv()
 
 # DB connection
-DS_HOST = "172.18.30.21"
-DS_USER = "dwclimatologia"
-DS_DB = "dw_climatologia"
+DS_DB = os.getenv("DS_DB")
+DS_HOST = os.getenv("DS_HOST")
+DS_PASS = os.getenv("DS_PASS")
+DS_USER = os.getenv("DS_USER")
 
-# -------------------------------------------------------------------------------------------------
-import imp
-
-# open secrets files
-with open(".hidden/secrets.py", "rb") as lfh:
-    # import module
-    hs = imp.load_module(".hidden", lfh, ".hidden/secrets", (".py", "rb", imp.PY_SOURCE))
-
-# -------------------------------------------------------------------------------------------------
-def bdc_connect(fs_user=DS_USER, fs_pass=hs.DS_PASS, fs_host=DS_HOST, fs_db=DS_DB):
+# ---------------------------------------------------------------------------------------------
+def bdc_connect(fs_host: typing.Optional[str]=DS_HOST,
+                fs_db: typing.Optional[str]=DS_DB,
+                fs_user: typing.Optional[str]=DS_USER,
+                fs_pass: typing.Optional[str]=DS_PASS):
     """
     connect to BDC
     """
@@ -40,7 +47,7 @@ def bdc_connect(fs_user=DS_USER, fs_pass=hs.DS_PASS, fs_host=DS_HOST, fs_db=DS_D
     # return
     return l_bdc
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 def bdc_save_metaf(fdt_gmt, fo_metaf, f_bdc):
     """
     write metaf data to BDC
@@ -49,11 +56,6 @@ def bdc_save_metaf(fdt_gmt, fo_metaf, f_bdc):
     :param fo_metaf (SMETAR): carrapato METAF
     :param f_bdc (conn): connection to BDC
     """
-    # metaf date
-    # ls_day = fo_metaf.s_forecast_time[:2]
-    # ls_hour = fo_metaf.s_forecast_time[2:4]
-    # ls_min = fo_metaf.s_forecast_time[4:6]
-
     # build date & time
     ldt_date = fdt_gmt.date()
     ldt_time = fdt_gmt.time()
@@ -85,7 +87,7 @@ def bdc_save_metaf(fdt_gmt, fo_metaf, f_bdc):
     # write to BDC
     bdc_write(f_bdc, ls_query)
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 def bdc_save_metar(fdt_gmt, fo_metar, f_bdc):
     """
     write metar data to BDC
@@ -94,11 +96,6 @@ def bdc_save_metar(fdt_gmt, fo_metar, f_bdc):
     :param fo_metar (SMETAR): METAR from location
     :param f_bdc (conn): connection to BDC
     """
-    # metar date
-    # ls_day = fo_metar.s_forecast_time[:2]
-    # ls_hour = fo_metar.s_forecast_time[2:4]
-    # ls_min = fo_metar.s_forecast_time[4:6]
-
     # build date & time
     ldt_date = fdt_gmt.date()
     ldt_time = fdt_gmt.time()
@@ -130,9 +127,10 @@ def bdc_save_metar(fdt_gmt, fo_metar, f_bdc):
     # write to BDC
     bdc_write(f_bdc, ls_query)
 
-# -------------------------------------------------------------------------------------------------
-def bdc_save_metsar(fdt_gmt, fs_icao_code, fi_tabs, fi_tpo,
-                    fi_wvel, fi_wdir, fi_wraj, fi_vis, fi_qnh, fs_mesg, f_bdc):
+# ---------------------------------------------------------------------------------------------
+def bdc_save_metsar(fdt_gmt, fs_icao_code: str, fi_tabs: int, fi_tpo: int,
+                    fi_wvel: int, fi_wdir: int, fi_wraj: int, fi_vis: int, 
+                    fi_qnh: int, fs_mesg: str, f_bdc):
     """
     write metsar data to BDC
 
@@ -169,7 +167,7 @@ def bdc_save_metsar(fdt_gmt, fs_icao_code, fi_tabs, fi_tpo,
     # write to BDC
     bdc_write(f_bdc, ls_query)
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 def bdc_save_metsar_b(fdt_gmt, fs_icao_code, fi_tabs, fi_tpo,
                       fi_wvel, fi_wdir, fi_wraj, fi_vis, fi_qnh, fs_mesg, f_bdc):
     """
@@ -208,7 +206,7 @@ def bdc_save_metsar_b(fdt_gmt, fs_icao_code, fi_tabs, fi_tpo,
     # write to BDC
     bdc_write(f_bdc, ls_query)
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 def bdc_write(f_bdc, fs_query):
     """
     execute query on BDC
@@ -223,4 +221,4 @@ def bdc_write(f_bdc, fs_query):
     # commit
     f_bdc.commit()
 
-# < the end >--------------------------------------------------------------------------------------
+# < the end >----------------------------------------------------------------------------------

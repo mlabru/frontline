@@ -2,9 +2,9 @@
 """
 fl_metar_parser
 
-2021/may  1.0  mlabru   initial version (Linux/Python)
+2021.may  mlabru  initial version (Linux/Python)
 """
-# < imports >--------------------------------------------------------------------------------------
+# < imports >----------------------------------------------------------------------------------
 
 # python library
 import logging
@@ -13,20 +13,20 @@ import re
 # local
 import fl_defs as df
 
-# < module data >----------------------------------------------------------------------------------
+# < logging >----------------------------------------------------------------------------------
 
 # logger
 M_LOG = logging.getLogger(__name__)
 M_LOG.setLevel(df.DI_LOG_LEVEL)
 
-# < SMetar >---------------------------------------------------------------------------------------
+# < SMetar >-----------------------------------------------------------------------------------
 
 class SMetar:
     """
     string parsing of weather station
     """
-    # ---------------------------------------------------------------------------------------------
-    def __init__(self, fs_metar_mesg):
+    # -----------------------------------------------------------------------------------------
+    def __init__(self, fs_metar_mesg: str):
         """
         constructor
 
@@ -151,8 +151,8 @@ class SMetar:
         # notes
         self._remarks(fs_metar_mesg)
 
-    # ---------------------------------------------------------------------------------------------
-    def _clouds_type(self, fs_metar_mesg):
+    # -----------------------------------------------------------------------------------------
+    def _clouds_type(self, fs_metar_mesg: str):
         """
         determining the type of cloudiness
         """
@@ -209,7 +209,8 @@ class SMetar:
                 self._s_clouds += ls_type_cloud + " "
 
                 # logger
-                M_LOG.info("Clouds: Few clouds at %d feet (%6.2f meter).", self._i_few_feet, self._f_few_m)
+                M_LOG.info("Clouds: Few clouds at %d feet (%6.2f meter).",
+                           self._i_few_feet, self._f_few_m)
 
             # sct ?
             if "SCT" == ls_type_cloud[:-3]:
@@ -223,7 +224,8 @@ class SMetar:
                 self._s_clouds += ls_type_cloud + " "
 
                 # logger
-                M_LOG.info("Clouds: Scattered clouds at %d feet (%6.2f meter).", self._i_sct_feet, self._f_sct_m)
+                M_LOG.info("Clouds: Scattered clouds at %d feet (%6.2f meter).",
+                           self._i_sct_feet, self._f_sct_m)
 
             # bkn ?
             if "BKN" == ls_type_cloud[:-3]:
@@ -237,7 +239,8 @@ class SMetar:
                 self._s_clouds += ls_type_cloud + " "
 
                 # logger
-                M_LOG.info("Clouds: Broken clouds at %d feet (%6.2f meter).", self._i_bkn_feet, self._f_bkn_m)
+                M_LOG.info("Clouds: Broken clouds at %d feet (%6.2f meter).",
+                           self._i_bkn_feet, self._f_bkn_m)
 
             # ovc ?
             if "OVC" == ls_type_cloud[:-3]:
@@ -251,7 +254,8 @@ class SMetar:
                 self._s_clouds += ls_type_cloud + " "
 
                 # logger
-                M_LOG.info("Clouds: Overcast clouds at %d feet (%6.2f meter).", self._i_ovc_feet, self._f_ovc_m)
+                M_LOG.info("Clouds: Overcast clouds at %d feet (%6.2f meter).",
+                           self._i_ovc_feet, self._f_ovc_m)
 
             # vv ?
             if "VV" == ls_type_cloud[:-3]:
@@ -274,8 +278,8 @@ class SMetar:
             # no clouds at all
             self._s_clouds = None
 
-    # ---------------------------------------------------------------------------------------------
-    def _forecast_time(self, fs_metar_mesg):
+    # -----------------------------------------------------------------------------------------
+    def _forecast_time(self, fs_metar_mesg: str):
         """
         search for the reporting time
         """
@@ -288,14 +292,14 @@ class SMetar:
             self._s_forecast_time = str(l_result[0])
 
             # logger
-            M_LOG.info("Time issued: %s %s:%s.", l_result[0][:2], l_result[0][2:4], l_result[0][4:6])
-
+            M_LOG.info("Time issued: %s %s:%s.", l_result[0][:2],
+                       l_result[0][2:4], l_result[0][4:6])
         else:
             # logger
             M_LOG.error("forecast time is mandatory.")
 
-    # ---------------------------------------------------------------------------------------------
-    def _icao_code(self, fs_metar_mesg):
+    # -----------------------------------------------------------------------------------------
+    def _icao_code(self, fs_metar_mesg: str):
         """
         ICAO Airport Index Search Method
         """
@@ -313,8 +317,8 @@ class SMetar:
             # logger
             M_LOG.error("ICAO code is mandatory.")
 
-    # ---------------------------------------------------------------------------------------------
-    def _pressure(self, fs_metar_mesg):
+    # -----------------------------------------------------------------------------------------
+    def _pressure(self, fs_metar_mesg: str):
         """
         pressure search method
         """
@@ -344,8 +348,8 @@ class SMetar:
             # logger
             M_LOG.info("Pressure: Sea level pressure is %d inHg.", self._i_pressure_inhg)
 
-    # ---------------------------------------------------------------------------------------------
-    def _remarks(self, fs_metar_mesg):
+    # -----------------------------------------------------------------------------------------
+    def _remarks(self, fs_metar_mesg: str):
         """
         notes
         """
@@ -379,8 +383,8 @@ class SMetar:
             # logger
             M_LOG.info("System needs maintance.")
 
-    # ---------------------------------------------------------------------------------------------
-    def _report_type(self, fs_metar_mesg):
+    # -----------------------------------------------------------------------------------------
+    def _report_type(self, fs_metar_mesg: str):
         """
         determining the type of report
 
@@ -411,8 +415,8 @@ class SMetar:
                 # logger
                 M_LOG.info("Report type: This is a fully automated report")
 
-    # ---------------------------------------------------------------------------------------------
-    def _temperature(self, fs_metar_mesg):
+    # -----------------------------------------------------------------------------------------
+    def _temperature(self, fs_metar_mesg: str):
         """
         find the temperature and dewpoints
         """
@@ -439,13 +443,12 @@ class SMetar:
             self._i_dewpoint_f = int((self._i_dewpoint_c * 9 / 5) + 32)
 
             # logger
-            M_LOG.info("Temperature %d°C (%d°F) Dewpoint %d°C (%d°F).", self._i_temperature_c,
-                                                                        self._i_temperature_f,
-                                                                        self._i_dewpoint_c,
-                                                                        self._i_dewpoint_f)
+            M_LOG.info("Temperature %d°C (%d°F) Dewpoint %d°C (%d°F).",
+                       self._i_temperature_c, self._i_temperature_f,
+                       self._i_dewpoint_c, self._i_dewpoint_f)
 
-    # ---------------------------------------------------------------------------------------------
-    def _trends(self, fs_metar_mesg):
+    # -----------------------------------------------------------------------------------------
+    def _trends(self, fs_metar_mesg: str):
         """
         forecasting changes
         """
@@ -477,8 +480,8 @@ class SMetar:
                 # logger
                 M_LOG.info("Trends: Temporary significant changes in weather conditions are expected.")
 
-    # ---------------------------------------------------------------------------------------------
-    def _visibility(self, fs_metar_mesg):
+    # -----------------------------------------------------------------------------------------
+    def _visibility(self, fs_metar_mesg: str):
         """
         determining visibility conditions
         """
@@ -515,7 +518,7 @@ class SMetar:
                     # logger
                     M_LOG.info("Visibility: %d meter.", self._i_visibility)
 
-    # ---------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------
     def _weather_type(self, fs_metar_mesg):
         """
         weather type determination
@@ -540,8 +543,8 @@ class SMetar:
                 # logger
                 M_LOG.info("Weather: %s.", str(self._s_weather_text))
 
-    # ---------------------------------------------------------------------------------------------
-    def _wind_type(self, fs_metar_mesg):
+    # -----------------------------------------------------------------------------------------
+    def _wind_type(self, fs_metar_mesg: str):
         """
         determination of speed and wind guide
         """
@@ -560,9 +563,8 @@ class SMetar:
             self._i_wind_vel_kt = int(round(self._i_wind_vel_mps * df.DF_MPS2KT, 0))
 
             # logger
-            M_LOG.info("Wind: Winds from %d° at %d mps (%d knots).", self._i_wind_dir,
-                                                                     self._i_wind_vel_mps,
-                                                                     self._i_wind_vel_kt)
+            M_LOG.info("Wind: Winds from %d° at %d mps (%d knots).",
+                       self._i_wind_dir, self._i_wind_vel_mps, self._i_wind_vel_kt)
 
         # search for velocity (kt)
         l_results = re.search(r"[0-9]{5}KT", fs_metar_mesg)
@@ -579,9 +581,8 @@ class SMetar:
             self._i_wind_vel_mps = int(round(self._i_wind_vel_kt * df.DF_KT2MPS, 0))
 
             # logger
-            M_LOG.info("Wind: Winds from %d° at %d knots (%d mps).", self._i_wind_dir,
-                                                                     self._i_wind_vel_kt,
-                                                                     self._i_wind_vel_mps)
+            M_LOG.info("Wind: Winds from %d° at %d knots (%d mps).",
+                       self._i_wind_dir, self._i_wind_vel_kt, self._i_wind_vel_mps)
 
         # search for gust (mps)
         l_results = re.search(r"[0-9]{5}G[0-9]{2}MPS", fs_metar_mesg)
@@ -603,10 +604,8 @@ class SMetar:
             self._i_gust_kt = int(round(self._i_gust_mps * df.DF_MPS2KT, 0))
 
             # logger
-            M_LOG.info("Wind: Winds from %d° at %d mps with gusts up to %d mps (%d knots).", self._i_wind_dir,
-                                                                                             self._i_wind_vel_mps,
-                                                                                             self._i_gust_mps,
-                                                                                             self._i_gust_kt)
+            M_LOG.info("Wind: Winds from %d° at %d mps with gusts up to %d mps (%d knots).",
+                       self._i_wind_dir, self._i_wind_vel_mps, self._i_gust_mps, self._i_gust_kt)
 
         # search for gust (kt)
         l_results = re.search(r"[0-9]{5}G[0-9]{2}KT", fs_metar_mesg)
@@ -628,10 +627,8 @@ class SMetar:
             self._i_gust_mps = int(round(self._i_gust_kt * df.DF_KT2MPS, 0))
 
             # logger
-            M_LOG.info("Wind: Winds from %d° at %d knots with gusts up to %d knots (%d mps).", self._i_wind_dir,
-                                                                                               self._i_wind_vel_kt,
-                                                                                               self._i_gust_kt,
-                                                                                               self._i_gust_mps)
+            M_LOG.info("Wind: Winds from %d° at %d knots with gusts up to %d knots (%d mps).",
+                       self._i_wind_dir, self._i_wind_vel_kt, self._i_gust_kt, self._i_gust_mps)
 
         # search for variable (mps)
         l_results = re.search(r"VRB[0-9]{2}MPS", fs_metar_mesg)
@@ -648,8 +645,8 @@ class SMetar:
             self._i_wind_vel_kt = int(round(self._i_wind_vel_mps * df.DF_MPS2KT, 0))
 
             # logger
-            M_LOG.info("Variable winds directions at %d mps (%d knots).", self._i_wind_vel_mps,
-                                                                          self._i_wind_vel_kt)
+            M_LOG.info("Variable winds directions at %d mps (%d knots).",
+                       self._i_wind_vel_mps, self._i_wind_vel_kt)
 
         # search for variable (kt)
         l_results = re.search(r"VRB[0-9]{2}KT", fs_metar_mesg)
@@ -666,8 +663,8 @@ class SMetar:
             self._i_wind_vel_mps = int(round(self._i_wind_vel_kt * df.DF_KT2MPS, 0))
 
             # logger
-            M_LOG.info("Variable winds directions at %d knots (%d mps).", self._i_wind_vel_kt,
-                                                                          self._i_wind_vel_mps)
+            M_LOG.info("Variable winds directions at %d knots (%d mps).",
+                       self._i_wind_vel_kt, self._i_wind_vel_mps)
 
         # search for min/max (°)
         l_results = re.search(r"[0-9]{3}V[0-9]{3}", fs_metar_mesg)
@@ -682,10 +679,10 @@ class SMetar:
             self._i_wind_dir_max = int(l_results[0][4:])
 
             # logger
-            M_LOG.info("Variable winds direction between %d° and %d°.", self._i_wind_dir_min,
-                                                                        self._i_wind_dir_max)
+            M_LOG.info("Variable winds direction between %d° and %d°.",
+                       self._i_wind_dir_min, self._i_wind_dir_max)
 
-    # ---------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------
     def _cut_id(self):
         """
         cut off the message id
@@ -698,114 +695,114 @@ class SMetar:
     # data
     # =============================================================================================
 
-    # ---------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------
     @property
     def v_cavok(self):
         """ceiling and visibility flag"""
         return self._v_cavok
 
-    # ---------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------
     @property
     def s_clouds(self):
         """clouds group string"""
         return self._s_clouds
 
-    # ---------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------
     @property
     def i_dewpoint_c(self):
         """dewpoint in °C"""
         return self._i_dewpoint_c
 
-    # ---------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------
     @property
     def s_forecast_time(self):
         """forecast time"""
         return self._s_forecast_time
 
-    # ---------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------
     @property
     def i_gust_kt(self):
         """gust of wind in kt"""
         return self._i_gust_kt
 
-    # ---------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------
     @property
     def s_icao_code(self):
         """icao code"""
         return self._s_icao_code
 
-    # ---------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------
     @property
     def s_metar_mesg(self):
         """metar string message"""
         return self._s_metar_mesg
 
-    # ---------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------
     @property
     def s_pressure(self):
         """pressure"""
         return self._s_pressure
 
-    # ---------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------
     @property
     def i_pressure_hpa(self):
         """pressure in hPa"""
         return self._i_pressure_hpa
 
-    # ---------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------
     @property
     def i_temperature_c(self):
         """temperature in °C"""
         return self._i_temperature_c
 
-    # ---------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------
     @property
     def s_temperature(self):
         """temperature"""
         return self._s_temperature
 
-    # ---------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------
     @property
     def i_visibility(self):
         """visibility in m"""
         return self._i_visibility
 
-    # ---------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------
     @property
     def s_visibility(self):
         """visibility"""
         return self._s_visibility
 
-    # ---------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------
     @property
     def s_wind(self):
         """wind"""
         return self._s_wind
 
-    # ---------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------
     @property
     def s_wind_var(self):
         """wind"""
         return self._s_wind_var
 
-    # ---------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------
     @property
     def i_wind_dir(self):
         """wind direction in °"""
         return self._i_wind_dir
 
-    # ---------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------
     @property
     def i_wind_vel_kt(self):
         """wind velocity in kt"""
         return self._i_wind_vel_kt
 
-# -------------------------------------------------------------------------------------------------
-def _get_metar_mesg(fs_station_file):
+# ---------------------------------------------------------------------------------------------
+def _get_metar_mesg(fs_station_file: str):
     """
     read a string from a file with a metar
 
-    :param fs_station_file (str): station file
+    :param fs_station_file (str): station filename
     """
     # open carrapato for read metaf data
     with open(fs_station_file, "r") as lfh_md:
@@ -815,8 +812,8 @@ def _get_metar_mesg(fs_station_file):
     # return
     return ls_line
 
-# -------------------------------------------------------------------------------------------------
-def metar_parse(fs_metar_mesg):
+# ---------------------------------------------------------------------------------------------
+def metar_parse(fs_metar_mesg: str):
     """
     metar parse
 
@@ -825,12 +822,14 @@ def metar_parse(fs_metar_mesg):
     # return
     return SMetar(fs_metar_mesg.strip())
 
-# -------------------------------------------------------------------------------------------------
-def metar_parse_file(fs_station_file):
+# ---------------------------------------------------------------------------------------------
+def metar_parse_file(fs_station_file: str):
     """
     metar parse file
+
+    :param fs_station_file (str): station filename
     """
     # return
     return metar_parse(_get_metar_mesg(fs_station_file))
 
-# < the end >--------------------------------------------------------------------------------------
+# < the end >----------------------------------------------------------------------------------

@@ -2,9 +2,9 @@
 """
 frontline
 
-2021/may  1.0  mlabru   initial version (Linux/Python)
+2021.may  mlabru   initial version (Linux/Python)
 """
-# < imports >--------------------------------------------------------------------------------------
+# < imports >----------------------------------------------------------------------------------
 
 # python library
 import argparse
@@ -24,7 +24,7 @@ import fl_metsar_gen as mg
 import fl_metar_parser as mp
 import fl_send_bdc as sb
 
-# < logging >--------------------------------------------------------------------------------------
+# < logging >----------------------------------------------------------------------------------
 
 # logger
 M_LOG = logging.getLogger(__name__)
@@ -51,7 +51,7 @@ M_LOG.setLevel(df.DI_LOG_LEVEL)
 # add the handlers to the logger
 # M_LOG.addHandler(M_LOG_CH)
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 def arg_parse():
     """
     parse command line arguments
@@ -74,7 +74,7 @@ def arg_parse():
     # return arguments
     return l_parser.parse_args()
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 def get_date_range(f_args):
     """
     get initial and final dates
@@ -130,7 +130,7 @@ def get_date_range(f_args):
     # return initial date and delta in hours
     return ldt_ini.replace(minute=0, second=0, microsecond=0), li_delta
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 def get_station_code(fs_file):
     """
     get ICAO Code from file name
@@ -145,7 +145,7 @@ def get_station_code(fs_file):
     # return icao code
     return llst_tmp[2].strip().upper()
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 def parse_date(fs_data):
     """
     parse date
@@ -171,7 +171,7 @@ def parse_date(fs_data):
     # return date in datetime format
     return ldt_date
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 def save_metar(fs_fout, fs_metar_mesg):
     """
     save METAR to file
@@ -184,7 +184,7 @@ def save_metar(fs_fout, fs_metar_mesg):
         # write output file
         lfh_out.write(fs_metar_mesg)
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 def trata_aerodromo(fdt_gmt, fs_icao_code, f_bdc):
     """
     trata aerodromo
@@ -217,7 +217,7 @@ def trata_aerodromo(fdt_gmt, fs_icao_code, f_bdc):
         # logger
         M_LOG.error("METAR for %s at %s not found. Skipping.", fs_icao_code, ls_date)
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 def trata_carrapato(fdt_gmt, fs_file, f_bdc):
     """
     trata carrapato
@@ -290,7 +290,7 @@ def trata_carrapato(fdt_gmt, fs_file, f_bdc):
             # gera METSAR from METAF (carrapato)
             mg.make_metsar_from_file(ls_fname)
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 def main():
     """
     main
@@ -320,7 +320,7 @@ def main():
         M_LOG.info("Processando, estação: %s data: %s.", ls_station, ls_date)
 
         # create trata_carrapato threads list
-        llst_thr_carrapato = list()
+        llst_thr_carrapato = []
 
         # find all stations in directory...
         for ls_file in glob.glob("{}/saida_carrapato_{}_{}.txt".format(df.DS_TICKS_DIR, ls_station, ls_date)):
@@ -341,7 +341,7 @@ def main():
         M_LOG.debug("Encontrados %d carrapatos.\n%s", len(llst_thr_carrapato), str(llst_thr_carrapato))
         
         # create carrapato ok list
-        llst_carrapato_ok = list()
+        llst_carrapato_ok = []
 
         # for all carrapato threads...
         for (ls_station, l_thr) in llst_thr_carrapato:
@@ -357,7 +357,7 @@ def main():
         M_LOG.debug("Encontrados %d aeródromos na REDEMET.\n%s", len(rm.DDCT_AERODROMOS), rm.DDCT_AERODROMOS)
 
         # create threads list
-        llst_thr_aerodromo = list()
+        llst_thr_aerodromo = []
 
         # for all remaining aeródromos...
         for ls_code in rm.DDCT_AERODROMOS:
@@ -396,7 +396,7 @@ def main():
     # close BDC
     l_bdc.close()
 
-# -------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------
 # this is the bootstrap process
 
 if "__main__" == __name__:
@@ -409,4 +409,4 @@ if "__main__" == __name__:
     # run application
     sys.exit(main())
 
-# < the end >--------------------------------------------------------------------------------------
+# < the end >----------------------------------------------------------------------------------
