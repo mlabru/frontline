@@ -17,7 +17,7 @@ import fl_defs as df
 
 # logger
 M_LOG = logging.getLogger(__name__)
-M_LOG.setLevel(df.DI_LOG_LEVEL)
+M_LOG.setLevel(logging.WARNING)
 
 # < SMetar >-----------------------------------------------------------------------------------
 

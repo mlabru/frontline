@@ -2,6 +2,7 @@
 """
 fl_defs
 
+2023.may  mlabru  referências aos diretórios alterados. Compatibilidade com GORmet
 2021.may  mlabru  initial version (Linux/Python)
 """
 # < imports >----------------------------------------------------------------------------------
@@ -12,8 +13,8 @@ import logging
 # < defines >----------------------------------------------------------------------------------
 
 # logging level
-DI_LOG_LEVEL = logging.WARNING
-# DI_LOG_LEVEL = logging.DEBUG
+# DI_LOG_LEVEL = logging.WARNING
+DI_LOG_LEVEL = logging.DEBUG
 
 # GMT is ahead of us
 DI_DIFF_GMT = 3
@@ -30,16 +31,6 @@ DF_KT2MPS = 0.514444444
 
 # m/s -> kt
 DF_MPS2KT = 1.943844492
-
-
-# METARs directory
-DS_MET_DIR = "metars"
-
-# frontlines directory
-DS_OUT_DIR = "frontlines"
-
-# carrapatos directory
-DS_TICKS_DIR = "carrapatos"
 
 
 # maximum visibility (CAVOK)

@@ -2,7 +2,8 @@
 """
 fl_metsar_gen
 
-2021.may  mlabru   initial version (Linux/Python)
+2023.may  mlabru  referências aos diretórios alterados. Compatibilidade com GORmet
+2021.may  mlabru  initial version (Linux/Python)
 """
 # < imports >----------------------------------------------------------------------------------
 
@@ -15,6 +16,7 @@ import subprocess
 
 # local
 import fl_defs as df
+import fl_dirs as dr
 import fl_send_bdc as sb
 
 # < logging >----------------------------------------------------------------------------------
@@ -334,7 +336,7 @@ def ensamble_metar_metaf(fdt_gmt, fs_fout: str, fs_icao_code: str, fo_metar, fo_
     ls_mesg = "METSAR {} {} {} {} {} {}=".format(fs_icao_code, ls_time, ls_wind, ls_vis, ls_temp, ls_qnh)
 
     # create output file
-    with open (pathlib.PurePath(df.DS_OUT_DIR).joinpath(fs_fout), "w") as lfh_out:
+    with open (pathlib.PurePath(dr.DS_OUT_DIR).joinpath(fs_fout), "w") as lfh_out:
         # write output file
         lfh_out.write(ls_mesg)
 
@@ -391,7 +393,7 @@ def ensamble_station_data_metaf(fdt_gmt, fs_file: str, fs_icao_code: str,
             ls_out = fs_file.replace("carrapato", "frontline")
 
             # create output file
-            with open (pathlib.PurePath(df.DS_OUT_DIR).joinpath(ls_out), "w") as lfh_out:
+            with open (pathlib.PurePath(dr.DS_OUT_DIR).joinpath(ls_out), "w") as lfh_out:
                 # write output file
                 lfh_out.write(ls_mesg)
 
@@ -483,10 +485,10 @@ def make_metsar_from_file(fs_file: str):
     ls_out = fs_file.replace("carrapato", "frontline")
 
     # output filename
-    lo_out = pathlib.PurePath(df.DS_OUT_DIR).joinpath(ls_out)
+    lo_out = pathlib.PurePath(dr.DS_OUT_DIR).joinpath(ls_out)
 
     # save METSAR
-    shutil.copyfile(pathlib.PurePath(df.DS_TICKS_DIR).joinpath(fs_file), lo_out)
+    shutil.copyfile(pathlib.PurePath(dr.DS_TICKS_DIR).joinpath(fs_file), lo_out)
 
     # replace
     subprocess.call(["sed", "-i", "-e", "s/METAF/METSAR/g", str(lo_out)])
@@ -556,7 +558,7 @@ def make_metsar_from_metar(fdt_gmt, fs_fout, fs_icao_code, fo_metar, f_bdc):
        (fo_metar.s_temperature is not None) and \
        (fo_metar.s_pressure is not None):
         # create output file
-        with open (pathlib.PurePath(df.DS_OUT_DIR).joinpath(fs_fout), "w") as lfh_out:
+        with open (pathlib.PurePath(dr.DS_OUT_DIR).joinpath(fs_fout), "w") as lfh_out:
             # write output file
             lfh_out.write(ls_mesg)
 

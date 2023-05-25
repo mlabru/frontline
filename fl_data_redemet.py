@@ -16,7 +16,6 @@ import requests
 import dotenv
 
 # local
-import fl_defs as df
 import fl_metar_parser as mp
 
 # < environment >------------------------------------------------------------------------------
@@ -41,7 +40,7 @@ DS_AERODROMOS_URL = DS_REDEMET_URL + "aerodromos/?api_key={0}&pais=Brasil"
 
 # logger
 M_LOG = logging.getLogger(__name__)
-M_LOG.setLevel(df.DI_LOG_LEVEL)
+M_LOG.setLevel(logging.WARNING)
 
 # < local data >-------------------------------------------------------------------------------
 
@@ -161,8 +160,8 @@ def redemet_get_location(fs_date: str, fs_location: str):
         return None
 
     if llst_metars:
-        # location data
-        ldct_location = llst_metars[0]
+        # location last data
+        ldct_location = llst_metars[-1]
 
     # senão, no llst_metars
     else:

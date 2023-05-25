@@ -2,7 +2,8 @@
 """
 frontline
 
-2021.may  mlabru   initial version (Linux/Python)
+2023.may  mlabru  referências aos diretórios alterados. Compatibilidade com GORmet
+2021.may  mlabru  initial version (Linux/Python)
 """
 # < imports >----------------------------------------------------------------------------------
 
@@ -17,6 +18,7 @@ import threading
 
 # local
 import fl_defs as df
+import fl_dirs as dr
 import fl_data_inmet as im
 import fl_data_redemet as rm
 import fl_icao_ll as ll
@@ -180,7 +182,7 @@ def save_metar(fs_fout, fs_metar_mesg):
     :param fs_metar_mesg (str): METAR message
     """
     # create output file
-    with open (pathlib.PurePath(df.DS_MET_DIR).joinpath(fs_fout), "w") as lfh_out:
+    with open (pathlib.PurePath(dr.DS_MET_DIR).joinpath(fs_fout), "w") as lfh_out:
         # write output file
         lfh_out.write(fs_metar_mesg)
 
@@ -323,7 +325,7 @@ def main():
         llst_thr_carrapato = []
 
         # find all stations in directory...
-        for ls_file in glob.glob("{}/saida_carrapato_{}_{}.txt".format(df.DS_TICKS_DIR, ls_station, ls_date)):
+        for ls_file in glob.glob("{}/saida_carrapato_{}_{}.txt".format(dr.DS_TICKS_DIR, ls_station, ls_date)):
             # logger
             M_LOG.debug("Create and start thread for carrapato %s.", ls_file)
             
